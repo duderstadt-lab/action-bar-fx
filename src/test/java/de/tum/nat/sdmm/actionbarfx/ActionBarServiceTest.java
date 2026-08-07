@@ -109,15 +109,16 @@ public class ActionBarServiceTest {
 	}
 
 	@Test
-	public void bothSpellingsOfTheScanFolderAreScanned(
+	public void everySpellingOfTheScanFolderIsScanned(
 		@TempDir final Path installDir) throws IOException
 	{
 		final String previousIjDir = System.getProperty("ij.dir");
 		System.setProperty("ij.dir", installDir.toString());
 		try {
-			// The documented spelling and the obvious one to type.
-			for (final String scanDirName : new String[] { "action-bars",
-				"ActionBars" })
+			// Hyphens, case and the plural are all things people get "wrong", and
+			// none of them should leave a bar silently missing from the menu.
+			for (final String scanDirName : new String[] { "ActionBar", "action-bars",
+				"Action Bars" })
 			{
 				final File barDir = installDir.resolve(scanDirName).resolve("a-bar")
 					.toFile();
@@ -127,12 +128,13 @@ public class ActionBarServiceTest {
 						StandardCharsets.UTF_8));
 			}
 
+			// A folder that is not a scan folder must not be picked up.
+			assertTrue(installDir.resolve("plugins").toFile().mkdirs());
+
 			// A null context falls back to ij.dir, which is what this exercises.
 			final List<File> scanDirs = BarLocator.scanDirectories(null);
-			assertEquals(2, scanDirs.size());
-			assertEquals(2, BarLocator.findAllBars(scanDirs).size());
-			assertEquals("action-bars", BarLocator.scanDirectory(null).getName(),
-				"The documented spelling wins when both exist.");
+			assertEquals(3, scanDirs.size(), "Found: " + scanDirs);
+			assertEquals(3, BarLocator.findAllBars(scanDirs).size());
 		}
 		finally {
 			if (previousIjDir == null) System.clearProperty("ij.dir");
@@ -142,7 +144,7 @@ public class ActionBarServiceTest {
 
 	@Test
 	public void theExampleBarLoads() throws IOException {
-		final File exampleBar = new File("action-bars/fret-power-tools");
+		final File exampleBar = new File("ActionBar/fret-power-tools");
 		if (!BarIO.barFile(exampleBar).isFile()) return; // not run from the repo
 
 		final de.tum.nat.sdmm.actionbarfx.model.BarConfig config = BarIO.load(

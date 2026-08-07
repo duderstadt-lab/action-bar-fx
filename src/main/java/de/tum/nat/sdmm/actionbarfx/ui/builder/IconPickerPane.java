@@ -29,9 +29,12 @@
 package de.tum.nat.sdmm.actionbarfx.ui.builder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import org.kordamp.ikonli.Ikon;
@@ -40,57 +43,83 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import de.tum.nat.sdmm.actionbarfx.ui.ThemeManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
+import javafx.util.Duration;
 
-/** Browses the Material Design 2 icon pack. */
+/**
+ * Browses the Material Design 2 icon pack as a grid.
+ * <p>
+ * The pack ships about 7,500 icons with no category metadata, so the categories
+ * here are keyword groups over the icon names — enough to browse by eye when you
+ * do not already know the name to search for. Names are shown on hover and for
+ * the current selection rather than beside every icon, which would leave room
+ * for only a handful per screen.
+ */
 public class IconPickerPane extends VBox {
+
+	/** Icons per grid row. */
+	private static final int COLUMNS = 10;
+
+	private static final int ICON_SIZE = 22;
 
 	private static List<String> allIcons;
 
+	/**
+	 * Category name to the keywords an icon name must contain. Order matters:
+	 * this is the order of the tabs.
+	 */
+	private static final Map<String, List<String>> CATEGORIES = categories();
+
 	private final TextField filterField = new TextField();
-	private final ListView<String> list = new ListView<>();
-	private final FilteredList<String> filtered;
+	private final ListView<List<String>> grid = new ListView<>();
+	private final ObservableList<List<String>> rows = FXCollections
+		.observableArrayList();
+	private final Label selectionLabel = new Label();
+
+	private String selected;
+	private String category = "All";
+	private Runnable onAccept;
 
 	public IconPickerPane(final String initial) {
+		selected = initial;
+
 		setSpacing(8);
 		setPadding(new Insets(10));
 
-		filterField.setPromptText("Filter icons, for example 'tag' or 'focus'");
+		filterField.setPromptText("Search icons, for example 'tag', 'chart', 'dna'");
+		filterField.textProperty().addListener((obs, old, text) -> refresh());
 
-		final ObservableList<String> icons = FXCollections.observableArrayList(
-			icons());
-		filtered = new FilteredList<>(icons, s -> true);
-		list.setItems(filtered);
-		list.setCellFactory(view -> new IconCell());
-		list.setPrefHeight(380);
+		grid.setItems(rows);
+		grid.setCellFactory(view -> new IconRowCell());
+		grid.setPrefSize(COLUMNS * (ICON_SIZE + 20) + 24, 380);
+		grid.setFocusTraversable(false);
+		VBox.setVgrow(grid, Priority.ALWAYS);
 
-		filterField.textProperty().addListener((obs, old, text) -> {
-			final String needle = text == null ? "" : text.trim().toLowerCase(
-				Locale.ROOT);
-			filtered.setPredicate(literal -> needle.isEmpty() || literal.toLowerCase(
-				Locale.ROOT).contains(needle));
-		});
+		selectionLabel.getStyleClass().add("icon-selection");
 
-		if (initial != null && !initial.isEmpty()) {
-			list.getSelectionModel().select(initial);
-			list.scrollTo(initial);
-		}
-
-		getChildren().addAll(new Label("Icon"), filterField, list);
-		VBox.setVgrow(list, javafx.scene.layout.Priority.ALWAYS);
+		getChildren().addAll(filterField, buildCategoryTabs(), grid,
+			selectionLabel);
+		refresh();
 	}
 
 	public String getSelectedIcon() {
-		return list.getSelectionModel().getSelectedItem();
+		return selected;
 	}
 
 	/** Modal picker. Empty when cancelled. */
@@ -107,10 +136,94 @@ public class IconPickerPane extends VBox {
 			ButtonType.CANCEL);
 		ThemeManager.applyStylesheets(dialog.getDialogPane());
 
+		// Double-clicking an icon is the same as choosing it and pressing OK.
+		pane.onAccept = () -> dialog.setResult(pane.getSelectedIcon());
+
 		dialog.setResultConverter(button -> button == ButtonType.OK ? pane
 			.getSelectedIcon() : null);
 		return Optional.ofNullable(dialog.showAndWait().orElse(null));
 	}
+
+	// -- Layout --
+
+	private FlowPane buildCategoryTabs() {
+		final FlowPane tabs = new FlowPane(6, 6);
+		final ToggleGroup group = new ToggleGroup();
+		for (final String name : CATEGORIES.keySet()) {
+			final ToggleButton tab = new ToggleButton(name);
+			tab.setToggleGroup(group);
+			tab.setSelected(name.equals(category));
+			tab.setOnAction(e -> {
+				category = name;
+				tab.setSelected(true); // never leave the row with nothing selected
+				refresh();
+			});
+			tabs.getChildren().add(tab);
+		}
+		return tabs;
+	}
+
+	private void refresh() {
+		final String needle = filterField.getText() == null ? "" : filterField
+			.getText().trim().toLowerCase(Locale.ROOT);
+		final List<String> keywords = CATEGORIES.get(category);
+
+		final List<String> matches = new ArrayList<>();
+		for (final String literal : icons()) {
+			if (!needle.isEmpty() && !literal.contains(needle)) continue;
+			if (keywords != null && !matchesCategory(literal, keywords)) continue;
+			matches.add(literal);
+		}
+
+		rows.clear();
+		for (int i = 0; i < matches.size(); i += COLUMNS)
+			rows.add(matches.subList(i, Math.min(i + COLUMNS, matches.size())));
+
+		updateSelectionLabel(matches.size());
+	}
+
+	/**
+	 * Whole-word match against the hyphen-separated parts of an icon name.
+	 * Plain substring matching puts {@code abugida-devanagari} under anything
+	 * looking for "bug", which is worse than leaving it out.
+	 */
+	private static boolean matchesCategory(final String literal,
+		final List<String> keywords)
+	{
+		// Drop the pack prefix: mdi2a-account-alert -> account-alert
+		final int dash = literal.indexOf('-');
+		final String name = dash < 0 ? literal : literal.substring(dash + 1);
+		final List<String> parts = Arrays.asList(name.split("-"));
+
+		for (final String keyword : keywords) {
+			if (keyword.indexOf('-') >= 0) {
+				if (name.contains(keyword)) return true;
+			}
+			else if (parts.contains(keyword)) return true;
+		}
+		return false;
+	}
+
+	private void updateSelectionLabel(final int shown) {
+		final String what = selected == null || selected.isEmpty() ? "no icon"
+			: selected;
+		selectionLabel.setText(shown + " icons  ·  selected: " + what);
+	}
+
+	private void select(final String literal) {
+		selected = literal;
+		updateSelectionLabel(countShown());
+		grid.refresh();
+	}
+
+	private int countShown() {
+		int n = 0;
+		for (final List<String> row : rows)
+			n += row.size();
+		return n;
+	}
+
+	// -- Icon data --
 
 	/**
 	 * Every icon literal in the pack. The pack splits its icons across one enum
@@ -139,25 +252,88 @@ public class IconPickerPane extends VBox {
 		return allIcons;
 	}
 
-	/** Renders the icon next to its literal. */
-	private static class IconCell extends ListCell<String> {
+	private static Map<String, List<String>> categories() {
+		final Map<String, List<String>> map = new LinkedHashMap<>();
+		map.put("All", null);
+		map.put("Science", Arrays.asList("microscope", "atom", "molecule", "dna",
+			"flask", "test-tube", "chemical", "bacteria", "virus", "beaker",
+			"thermometer", "magnify", "eyedropper", "ruler", "scale", "waves",
+			"pulse", "sigma", "function", "math"));
+		map.put("Charts", Arrays.asList("chart", "graph", "poll", "table",
+			"database", "matrix", "calculator", "counter", "gauge", "speedometer"));
+		map.put("Image", Arrays.asList("image", "crop", "layers", "grid", "vector",
+			"shape", "square", "circle", "triangle", "hexagon", "brightness",
+			"contrast", "blur", "palette", "brush", "format-color", "eye",
+			"camera", "aspect", "flip", "rotate", "selection"));
+		map.put("Files", Arrays.asList("file", "folder", "archive", "download",
+			"upload", "content-save", "export", "import", "zip", "book", "clipboard",
+			"printer", "database"));
+		map.put("Edit", Arrays.asList("pencil", "edit", "tune", "cog", "wrench",
+			"tools", "filter", "eraser", "delete", "plus", "minus", "check", "close",
+			"refresh", "sync", "auto-fix", "format", "text", "undo", "redo",
+			"content-copy", "content-cut", "trash"));
+		map.put("Arrows", Arrays.asList("arrow", "chevron", "swap", "sort",
+			"transfer", "arrange", "menu-down", "menu-up", "expand", "collapse",
+			"unfold"));
+		map.put("Media", Arrays.asList("play", "pause", "stop", "record", "skip",
+			"movie", "video", "volume", "music", "camera", "step-forward",
+			"step-backward", "rewind", "fast-forward"));
+		map.put("Symbols", Arrays.asList("numeric", "alpha", "star", "heart",
+			"flag", "bookmark", "tag", "label", "information", "alert", "help",
+			"lightbulb", "check-circle", "close-circle", "circle-medium", "shield",
+			"lock", "key"));
+		map.put("Nature", Arrays.asList("leaf", "tree", "flower", "weather",
+			"water", "fire", "earth", "cloud", "snowflake", "bug", "fish", "bird",
+			"paw"));
+		map.put("Time", Arrays.asList("clock", "timer", "calendar", "history",
+			"alarm", "hourglass", "update"));
+		return map;
+	}
+
+	// -- Cells --
+
+	/** One row of the grid. Chunking keeps the ListView virtualized. */
+	private class IconRowCell extends ListCell<List<String>> {
+
+		private final HBox box = new HBox(4);
+
+		IconRowCell() {
+			box.setAlignment(Pos.CENTER_LEFT);
+			setGraphic(box);
+		}
 
 		@Override
-		protected void updateItem(final String literal, final boolean empty) {
-			super.updateItem(literal, empty);
-			if (empty || literal == null) {
-				setText(null);
-				setGraphic(null);
-				return;
-			}
-			setText(literal);
-			try {
-				final FontIcon icon = new FontIcon(literal);
-				icon.setIconSize(18);
-				setGraphic(icon);
-			}
-			catch (final RuntimeException e) {
-				setGraphic(null);
+		protected void updateItem(final List<String> literals, final boolean empty) {
+			super.updateItem(literals, empty);
+			box.getChildren().clear();
+			if (empty || literals == null) return;
+
+			for (final String literal : literals) {
+				final Button tile = new Button();
+				tile.getStyleClass().add("icon-tile");
+				if (literal.equals(selected)) //
+					tile.getStyleClass().add("icon-tile-selected");
+				try {
+					final FontIcon icon = new FontIcon(literal);
+					icon.setIconSize(ICON_SIZE);
+					tile.setGraphic(icon);
+				}
+				catch (final RuntimeException e) {
+					tile.setText("?");
+				}
+
+				final Tooltip tooltip = new Tooltip(literal);
+				tooltip.setShowDelay(Duration.millis(250));
+				tile.setTooltip(tooltip);
+
+				tile.setOnAction(e -> select(literal));
+				tile.setOnMouseClicked(e -> {
+					if (e.getClickCount() == 2 && onAccept != null) {
+						select(literal);
+						onAccept.run();
+					}
+				});
+				box.getChildren().add(tile);
 			}
 		}
 	}

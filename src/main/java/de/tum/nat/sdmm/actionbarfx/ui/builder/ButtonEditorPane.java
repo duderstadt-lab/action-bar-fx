@@ -32,8 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.scijava.Context;
@@ -50,12 +48,13 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -81,8 +80,9 @@ public class ButtonEditorPane extends VBox {
 	private final TextField labelField = new TextField();
 	private final CheckBox stepCheck = new CheckBox("Step");
 	private final Spinner<Integer> stepSpinner = new Spinner<>(1, 99, 1);
-	private final ComboBox<Integer> paletteCombo = new ComboBox<>();
-	private final CheckBox overrideCheck = new CheckBox("Custom color");
+	private final FlowPane swatches = new FlowPane(6, 6);
+	private final Label paletteName = new Label();
+	private final CheckBox overrideCheck = new CheckBox("Override with a custom color");
 	private final ColorPicker colorPicker = new ColorPicker();
 	private final TextField iconField = new TextField();
 	private final StackPane iconPreview = new StackPane();
@@ -141,8 +141,7 @@ public class ButtonEditorPane extends VBox {
 			if (spec.getStep() != null) stepSpinner.getValueFactory().setValue(spec
 				.getStep());
 
-			reloadPaletteChoices();
-			paletteCombo.setValue(spec.getPaletteIndex());
+			rebuildSwatches();
 
 			final boolean hasOverride = spec.getColor() != null && !spec.getColor()
 				.isEmpty();
@@ -206,13 +205,7 @@ public class ButtonEditorPane extends VBox {
 			changed();
 		});
 
-		paletteCombo.setCellFactory(view -> new SwatchCell());
-		paletteCombo.setButtonCell(new SwatchCell());
-		paletteCombo.valueProperty().addListener((obs, old, index) -> {
-			if (loading || spec == null) return;
-			spec.setPaletteIndex(index);
-			changed();
-		});
+		paletteName.getStyleClass().add("form-hint");
 
 		overrideCheck.selectedProperty().addListener((obs, old, selected) -> {
 			colorPicker.setDisable(!selected);
@@ -253,8 +246,9 @@ public class ButtonEditorPane extends VBox {
 		final HBox stepRow = new HBox(8, stepCheck, stepSpinner);
 		stepRow.setAlignment(Pos.CENTER_LEFT);
 
-		final HBox colorRow = new HBox(8, paletteCombo, overrideCheck, colorPicker);
-		colorRow.setAlignment(Pos.CENTER_LEFT);
+		final HBox overrideRow = new HBox(8, overrideCheck, colorPicker);
+		overrideRow.setAlignment(Pos.CENTER_LEFT);
+		final VBox colorRow = new VBox(6, swatches, paletteName, overrideRow);
 
 		iconPreview.setMinSize(24, 24);
 		final HBox iconRow = new HBox(8, iconPreview, iconField, chooseIcon,
@@ -423,12 +417,55 @@ public class ButtonEditorPane extends VBox {
 		macroEditor.setManaged(macroEditor.isVisible());
 	}
 
-	private void reloadPaletteChoices() {
-		final List<Integer> indices = new ArrayList<>();
-		indices.add(null);
-		for (int i = 0; i < palette.size(); i++)
-			indices.add(i);
-		paletteCombo.setItems(FXCollections.observableArrayList(indices));
+	/**
+	 * Draws the bar palette as clickable swatches.
+	 * <p>
+	 * The colors a bar uses come from its palette, chosen once for the whole bar;
+	 * a button just points at one entry. Showing the actual colors makes that
+	 * visible in a way a list of index numbers never did.
+	 */
+	private void rebuildSwatches() {
+		swatches.getChildren().clear();
+
+		final Integer current = spec.getPaletteIndex();
+		final boolean overridden = spec.getColor() != null && !spec.getColor()
+			.isEmpty();
+
+		for (int i = 0; i < palette.size(); i++) {
+			final int index = i;
+			final Button swatch = new Button();
+			swatch.getStyleClass().add("swatch");
+			if (!overridden && current != null && current == index) //
+				swatch.getStyleClass().add("swatch-selected");
+			swatch.setStyle("-fx-background-color: " + palette.color(index) + ";");
+			swatch.setTooltip(new Tooltip(palette.getName() + " " + index + "  " +
+				palette.color(index)));
+			swatch.setOnAction(e -> {
+				spec.setPaletteIndex(index);
+				// Picking from the palette clears a custom color, otherwise the
+				// click would appear to do nothing.
+				spec.setColor(null);
+				setSpec(spec, palette);
+				changed();
+			});
+			swatches.getChildren().add(swatch);
+		}
+
+		final Button none = new Button("—");
+		none.getStyleClass().add("swatch");
+		if (!overridden && current == null) none.getStyleClass().add(
+			"swatch-selected");
+		none.setStyle("-fx-background-color: " + Palette.NEUTRAL + ";");
+		none.setTooltip(new Tooltip("No palette color: a neutral gray"));
+		none.setOnAction(e -> {
+			spec.setPaletteIndex(null);
+			setSpec(spec, palette);
+			changed();
+		});
+		swatches.getChildren().add(none);
+
+		paletteName.setText("Palette: " + palette.getName() + " (" + palette
+			.size() + " colors, set for the whole bar at the top)");
 	}
 
 	private void refreshIconPreview() {
@@ -471,24 +508,4 @@ public class ButtonEditorPane extends VBox {
 			.round(color.getGreen() * 255), Math.round(color.getBlue() * 255));
 	}
 
-	/** Palette index rendered as a color swatch. */
-	private class SwatchCell extends ListCell<Integer> {
-
-		@Override
-		protected void updateItem(final Integer index, final boolean empty) {
-			super.updateItem(index, empty);
-			if (empty || index == null) {
-				setText(empty ? null : "No palette color");
-				setGraphic(null);
-				return;
-			}
-			setText(String.valueOf(index));
-			final Region swatch = new Region();
-			swatch.setMinSize(16, 16);
-			swatch.setPrefSize(16, 16);
-			swatch.setStyle("-fx-background-color: " + palette.color(index) +
-				"; -fx-background-radius: 3;");
-			setGraphic(swatch);
-		}
-	}
 }

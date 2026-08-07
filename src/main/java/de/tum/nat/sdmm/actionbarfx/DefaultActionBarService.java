@@ -251,9 +251,13 @@ public class DefaultActionBarService extends AbstractService implements
 			registered.clear();
 		}
 
-		for (final File barDir : BarLocator.findAllBars(BarLocator.scanDirectories(
-			context())))
-		{
+		final List<File> scanDirs = BarLocator.scanDirectories(context());
+		final List<File> found = BarLocator.findAllBars(scanDirs);
+		log.info("ActionBarFX: scanned " + (scanDirs.isEmpty() ? "nothing (no " +
+			BarLocator.SCAN_DIR_NAME + " folder in " + BarLocator.baseDirectory(
+				context()) + ")" : scanDirs) + ", found " + found.size() + " bar(s)");
+
+		for (final File barDir : found) {
 			try {
 				registerBarMenuEntry(barDir);
 			}

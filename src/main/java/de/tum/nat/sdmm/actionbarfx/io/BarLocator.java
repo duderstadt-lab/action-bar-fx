@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import org.scijava.Context;
 import org.scijava.app.AppService;
@@ -44,45 +45,56 @@ import de.tum.nat.sdmm.actionbarfx.model.BarConfig;
 public final class BarLocator {
 
 	/** Folder inside the Fiji installation that is scanned at startup. */
-	public static final String SCAN_DIR_NAME = "action-bars";
+	public static final String SCAN_DIR_NAME = "ActionBar";
 
 	/**
-	 * Spellings of the scan folder that are accepted, in order of preference.
-	 * The documented one is {@code action-bars}; {@code ActionBars} is accepted
-	 * too because it is the obvious thing to type, and a bar sitting in a folder
-	 * that is nearly right should not silently fail to appear in the menu.
+	 * Normalized names a scan folder may have. Rather than insisting on one
+	 * spelling, any folder in the Fiji installation whose name reduces to one of
+	 * these is scanned: {@code ActionBar}, {@code action-bars}, {@code Action
+	 * Bars} and so on all work. Getting the hyphen or the plural wrong is not a
+	 * mistake worth punishing with a bar that silently never appears.
 	 */
-	private static final String[] SCAN_DIR_NAMES = { SCAN_DIR_NAME, "ActionBars" };
+	private static final List<String> SCAN_DIR_KEYS = Arrays.asList("actionbar",
+		"actionbars", "actionbarfx");
 
 	private BarLocator() {}
 
 	/**
-	 * The scan folder in use: the first accepted spelling that exists, otherwise
-	 * the documented one. Falls back to the {@code ij.dir} property and then the
-	 * working directory when no {@link AppService} is available, so this also
-	 * does something sensible outside a full Fiji.
+	 * The scan folder in use: the first one that exists, otherwise the documented
+	 * name. Falls back to the {@code ij.dir} property and then the working
+	 * directory when no {@link AppService} is available, so this also does
+	 * something sensible outside a full Fiji.
 	 */
 	public static File scanDirectory(final Context context) {
-		final File base = baseDirectory(context);
-		for (final String name : SCAN_DIR_NAMES) {
-			final File candidate = new File(base, name);
-			if (candidate.isDirectory()) return candidate;
-		}
-		return new File(base, SCAN_DIR_NAME);
+		final List<File> dirs = scanDirectories(context);
+		return dirs.isEmpty() ? new File(baseDirectory(context), SCAN_DIR_NAME)
+			: dirs.get(0);
 	}
 
-	/** Every accepted scan folder that exists. */
+	/**
+	 * Every folder in the Fiji installation that looks like a scan folder, sorted
+	 * by name.
+	 */
 	public static List<File> scanDirectories(final Context context) {
 		final File base = baseDirectory(context);
 		final List<File> dirs = new ArrayList<>();
-		for (final String name : SCAN_DIR_NAMES) {
-			final File candidate = new File(base, name);
-			if (candidate.isDirectory()) dirs.add(candidate);
-		}
+		final File[] children = base.listFiles();
+		if (children == null) return dirs;
+		Arrays.sort(children, Comparator.comparing(File::getName,
+			String.CASE_INSENSITIVE_ORDER));
+		for (final File child : children)
+			if (child.isDirectory() && SCAN_DIR_KEYS.contains(normalize(child
+				.getName()))) dirs.add(child);
 		return dirs;
 	}
 
-	private static File baseDirectory(final Context context) {
+	/** Lowercases and drops anything that is not a letter or digit. */
+	private static String normalize(final String name) {
+		return name.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
+	}
+
+	/** The Fiji installation directory the scan folders are looked for in. */
+	public static File baseDirectory(final Context context) {
 		if (context != null) {
 			final AppService appService = context.getService(AppService.class);
 			if (appService != null && appService.getApp() != null) {

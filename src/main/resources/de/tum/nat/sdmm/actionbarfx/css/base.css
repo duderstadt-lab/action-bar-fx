@@ -82,3 +82,51 @@
     -fx-font-size: 12px;
     -fx-max-width: infinity;
 }
+
+/* Icon picker grid. Names are on hover, so the tiles stay small. */
+.icon-tile {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: transparent;
+    -fx-border-width: 2;
+    -fx-padding: 5;
+    -fx-cursor: hand;
+}
+
+.icon-tile:hover {
+    -fx-background-color: rgba(128, 128, 128, 0.22);
+}
+
+/* A literal color rather than an AtlantaFX variable: the selection ring has to
+   read the same whichever base theme is in force. */
+.icon-tile-selected {
+    -fx-border-color: #4C8DFF;
+    -fx-background-color: rgba(76, 141, 255, 0.16);
+}
+
+.icon-selection,
+.form-hint {
+    -fx-opacity: 0.75;
+    -fx-font-size: 11px;
+}
+
+/* Palette swatches in the button editor. */
+.swatch {
+    -fx-min-width: 26;
+    -fx-pref-width: 26;
+    -fx-min-height: 26;
+    -fx-pref-height: 26;
+    -fx-padding: 0;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-width: 2;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-font-size: 11px;
+    -fx-text-fill: #333333;
+}
+
+.swatch-selected {
+    -fx-border-color: #4C8DFF;
+}

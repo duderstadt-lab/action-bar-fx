@@ -60,12 +60,12 @@ import javafx.stage.Stage;
  * mvn -q test-compile
  * mvn -q exec:java -Dexec.classpathScope=test \
  *     -Dexec.mainClass=de.tum.nat.sdmm.actionbarfx.ui.ActionBarPreview \
- *     -Dexec.args=action-bars/fret-power-tools
+ *     -Dexec.args=ActionBar/fret-power-tools
  * </pre>
  */
 public class ActionBarPreview extends Application {
 
-	private static final String DEFAULT_BAR = "action-bars/fret-power-tools";
+	private static final String DEFAULT_BAR = "ActionBar/fret-power-tools";
 
 	@Override
 	public void start(final Stage stage) throws Exception {
