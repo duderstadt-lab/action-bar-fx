@@ -1,0 +1,45 @@
+/*
+ * Light theme. Every state derives from -button-accent, the single base color
+ * a button stores. ladder() picks the text color, so no second color list is
+ * needed for contrast.
+ */
+
+.action-button {
+    -button-fg: ladder(-button-accent, white 49%, black 50%);
+    -fx-background-color: -button-accent;
+    -fx-text-fill: -button-fg;
+}
+
+.action-button:hover {
+    -fx-background-color: derive(-button-accent, 12%);
+}
+
+.action-button:pressed {
+    -fx-background-color: derive(-button-accent, -12%);
+}
+
+.action-button.action-error {
+    -fx-border-color: #C62828;
+    -fx-border-width: 2;
+    -fx-border-radius: 7;
+}
+
+.action-button .action-label,
+.action-button .ikonli-font-icon {
+    -fx-text-fill: -button-fg;
+    -fx-icon-color: -button-fg;
+}
+
+.action-button .step-badge {
+    -fx-background-color: -button-fg;
+    -fx-text-fill: -button-accent;
+}
+
+.toast {
+    -fx-background-color: rgba(30, 30, 30, 0.88);
+    -fx-text-fill: white;
+}
+
+.toast-error {
+    -fx-background-color: #C62828;
+}

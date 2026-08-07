@@ -1,0 +1,119 @@
+{
+  "formatVersion" : 1,
+  "title" : "FRET power tools",
+  "palette" : "legacy-pastel",
+  "width" : 320,
+  "items" : [ {
+    "type" : "button",
+    "label" : "Beam profile corrector",
+    "paletteIndex" : 0,
+    "icon" : "mdi2b-blur-radial",
+    "action" : {
+      "type" : "command",
+      "class" : "de.mpg.biochem.mars.image.commands.BeamProfileCorrectionCommand",
+      "menuPath" : "Plugins>Mars>Image>Util>Beam Profile Corrector"
+    }
+  }, {
+    "type" : "button",
+    "label" : "Peak finder",
+    "paletteIndex" : 1,
+    "icon" : "mdi2c-chart-bell-curve",
+    "action" : {
+      "type" : "command",
+      "class" : "de.mpg.biochem.mars.image.commands.PeakFinderCommand",
+      "menuPath" : "Plugins>Mars>Image>Peak Finder"
+    }
+  }, {
+    "type" : "button",
+    "label" : "Transform ROIs",
+    "paletteIndex" : 2,
+    "icon" : "mdi2v-vector-square",
+    "action" : {
+      "type" : "command",
+      "class" : "de.mpg.biochem.mars.roi.commands.TransformROIsCommand",
+      "menuPath" : "Plugins>Mars>ROI>Transform ROIs"
+    }
+  }, {
+    "type" : "button",
+    "label" : "Molecule integrator (multiview)",
+    "paletteIndex" : 3,
+    "icon" : "mdi2f-format-list-numbered",
+    "action" : {
+      "type" : "command",
+      "class" : "de.mpg.biochem.mars.image.commands.MoleculeIntegratorMultiViewCommand",
+      "menuPath" : "Plugins>Mars>Image>Molecule Integrator (multiview)"
+    }
+  }, {
+    "type" : "button",
+    "label" : "Merge archives",
+    "paletteIndex" : 4,
+    "icon" : "mdi2s-source-merge",
+    "action" : {
+      "type" : "command",
+      "class" : "de.mpg.biochem.mars.molecule.commands.MergeCommand",
+      "menuPath" : "Plugins>Mars>Molecule>Merge Archives"
+    }
+  }, {
+    "type" : "separator"
+  }, {
+    "type" : "button",
+    "label" : "add molecule tags",
+    "step" : 1,
+    "paletteIndex" : 5,
+    "icon" : "mdi2t-tag-outline",
+    "action" : {
+      "type" : "script",
+      "path" : "scripts/FRET_workflow_1_add_molecule_tags.groovy"
+    }
+  }, {
+    "type" : "button",
+    "label" : "profile correction",
+    "step" : 2,
+    "paletteIndex" : 6,
+    "icon" : "mdi2t-tune-variant",
+    "action" : {
+      "type" : "script",
+      "path" : "scripts/FRET_workflow_2_profile_correction.groovy"
+    }
+  }, {
+    "type" : "button",
+    "label" : "find bleaching positions",
+    "step" : 3,
+    "paletteIndex" : 7,
+    "icon" : "mdi2m-magnify-scan",
+    "action" : {
+      "type" : "script",
+      "path" : "scripts/FRET_workflow_3_find_bleaching_positions.groovy"
+    }
+  }, {
+    "type" : "button",
+    "label" : "alex corrections",
+    "step" : 4,
+    "paletteIndex" : 8,
+    "icon" : "mdi2c-calculator-variant-outline",
+    "action" : {
+      "type" : "script",
+      "path" : "scripts/FRET_workflow_4_alex_corrections.groovy"
+    }
+  }, {
+    "type" : "button",
+    "label" : "two state fit",
+    "step" : 5,
+    "paletteIndex" : 9,
+    "icon" : "mdi2s-stairs",
+    "action" : {
+      "type" : "script",
+      "path" : "scripts/FRET_workflow_5_two_state_dwell_times.groovy"
+    }
+  }, {
+    "type" : "button",
+    "label" : "corrections without aex",
+    "step" : 6,
+    "paletteIndex" : 10,
+    "icon" : "mdi2c-calculator-variant",
+    "action" : {
+      "type" : "script",
+      "path" : "scripts/FRET_workflow_6_corrections_without_aex.groovy"
+    }
+  } ]
+}

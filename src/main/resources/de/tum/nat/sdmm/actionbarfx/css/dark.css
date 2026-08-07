@@ -1,0 +1,48 @@
+/*
+ * Dark theme.
+ *
+ * The hues are deliberately NOT remapped: the color coding is the identity of
+ * a button, and a user who learned "the blue one" must find the blue one in
+ * either theme. Instead the same hue is darkened, with the text lightened from
+ * that hue.
+ */
+
+.action-button {
+    -button-fg: derive(-button-accent, 55%);
+    -fx-background-color: derive(-button-accent, -45%);
+    -fx-text-fill: -button-fg;
+}
+
+.action-button:hover {
+    -fx-background-color: derive(-button-accent, -33%);
+}
+
+.action-button:pressed {
+    -fx-background-color: derive(-button-accent, -55%);
+}
+
+.action-button.action-error {
+    -fx-border-color: #EF5350;
+    -fx-border-width: 2;
+    -fx-border-radius: 7;
+}
+
+.action-button .action-label,
+.action-button .ikonli-font-icon {
+    -fx-text-fill: -button-fg;
+    -fx-icon-color: -button-fg;
+}
+
+.action-button .step-badge {
+    -fx-background-color: -button-fg;
+    -fx-text-fill: derive(-button-accent, -55%);
+}
+
+.toast {
+    -fx-background-color: rgba(20, 20, 20, 0.92);
+    -fx-text-fill: white;
+}
+
+.toast-error {
+    -fx-background-color: #B71C1C;
+}

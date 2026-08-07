@@ -1,0 +1,57 @@
+{
+  "palettes": [
+    {
+      "id": "okabe-ito",
+      "name": "Okabe–Ito",
+      "notes": "Colorblind-safe. The default.",
+      "colors": [
+        "#E69F00", "#56B4E9", "#009E73", "#F0E442",
+        "#0072B2", "#D55E00", "#CC79A7", "#999999"
+      ]
+    },
+    {
+      "id": "tol-bright",
+      "name": "Tol bright",
+      "colors": [
+        "#4477AA", "#EE6677", "#228833", "#CCBB44",
+        "#66CCEE", "#AA3377", "#BBBBBB"
+      ]
+    },
+    {
+      "id": "tableau",
+      "name": "Tableau 10",
+      "notes": "Familiar, but not fully CVD-safe.",
+      "colors": [
+        "#4E79A7", "#F28E2B", "#E15759", "#76B7B2", "#59A14F",
+        "#EDC948", "#B07AA1", "#FF9DA7", "#9C755F", "#BAB0AC"
+      ]
+    },
+    {
+      "id": "tol-muted",
+      "name": "Tol muted",
+      "colors": [
+        "#332288", "#88CCEE", "#44AA99", "#117733", "#999933",
+        "#DDCC77", "#CC6677", "#882255", "#AA4499", "#777777"
+      ]
+    },
+    {
+      "id": "tol-extended",
+      "name": "Tol extended",
+      "notes": "Past about 12 colors, rely on badges and separators too.",
+      "colors": [
+        "#332288", "#88CCEE", "#44AA99", "#117733", "#999933",
+        "#DDCC77", "#CC6677", "#882255", "#AA4499", "#777777",
+        "#6699CC", "#004488", "#EE7733", "#009988", "#BBBBBB"
+      ]
+    },
+    {
+      "id": "legacy-pastel",
+      "name": "Original pastels",
+      "notes": "Matches the FRET Power Tools bar from the legacy ActionBar plugin.",
+      "colors": [
+        "#BFB1AE", "#F2E8B4", "#F4AC6A", "#E58177", "#9AA396", "#7C89B4",
+        "#A26A64", "#A8D3EC", "#E8DC50", "#87CFA9", "#CBB5DC"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+/*
+ * Layout and structure, shared by both themes. Colors live in light.css and
+ * dark.css, and every one of them derives from -button-accent, which each
+ * button sets inline.
+ */
+
+.action-bar {
+    -fx-padding: 0;
+}
+
+.action-bar-scroll {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.action-bar-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.action-bar-rows {
+    -fx-spacing: 7;
+    -fx-padding: 10;
+}
+
+.action-button {
+    -fx-background-radius: 7;
+    -fx-padding: 11 14 11 14;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+    -fx-font-size: 13px;
+    -fx-effect: null;
+}
+
+.action-button .action-label {
+    -fx-font-size: 13px;
+}
+
+/*
+ * JavaFX 23 can transition <number> and <paint> properties, so the scale
+ * animation is pure stylesheet. Background interpolation only arrived in
+ * JavaFX 24, so the color change on hover snaps rather than fades. Do not
+ * design an effect around -fx-padding, -fx-border-width or -fx-font-size:
+ * those cannot be transitioned on any version.
+ */
+.hover-lift {
+    transition: -fx-scale-x 130ms ease-out, -fx-scale-y 130ms ease-out;
+}
+
+.hover-lift:hover {
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.action-button:disabled {
+    -fx-opacity: 0.55;
+}
+
+/* Buttons without a step still reserve this slot, so labels line up. */
+.action-button .step-badge {
+    -fx-min-width: 20;
+    -fx-pref-width: 20;
+    -fx-min-height: 20;
+    -fx-pref-height: 20;
+    -fx-background-radius: 10;
+    -fx-alignment: center;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 0;
+}
+
+.action-button .action-busy {
+    -fx-progress-color: -button-fg;
+}
+
+.bar-separator {
+    -fx-padding: 3 2 3 2;
+}
+
+.toast {
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 6;
+    -fx-font-size: 12px;
+    -fx-max-width: infinity;
+}
