@@ -63,6 +63,7 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -132,6 +133,10 @@ public class BarBuilderDialog {
 		stage.toFront();
 	}
 
+	public Stage getStage() {
+		return stage;
+	}
+
 	// -- Layout --
 
 	private Region buildBarSettings() {
@@ -167,6 +172,10 @@ public class BarBuilderDialog {
 
 	private Region buildCenter() {
 		itemList.setPrefWidth(240);
+		final Label empty = new Label("No rows yet.\nPress Button to add one.");
+		empty.getStyleClass().add("form-hint");
+		empty.setWrapText(true);
+		itemList.setPlaceholder(empty);
 		itemList.getSelectionModel().selectedItemProperty().addListener((obs, old,
 			item) -> editor.setSpec(item instanceof ButtonSpec ? (ButtonSpec) item
 				: null, palette()));
@@ -214,8 +223,11 @@ public class BarBuilderDialog {
 		final Button down = new Button("↓");
 		down.setOnAction(e -> move(1));
 
-		final HBox box = new HBox(6, addButton, addSeparator, duplicate, remove, up,
-			down);
+		// A FlowPane, not an HBox: six buttons do not fit the width of the item
+		// list, and an HBox truncates them to "Butt...", "Separa..." rather than
+		// wrapping.
+		final FlowPane box = new FlowPane(6, 6, addButton, addSeparator, duplicate,
+			remove, up, down);
 		box.setAlignment(Pos.CENTER_LEFT);
 		return box;
 	}

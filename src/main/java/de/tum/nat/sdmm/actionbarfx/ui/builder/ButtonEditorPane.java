@@ -100,6 +100,11 @@ public class ButtonEditorPane extends VBox {
 	private final VBox scriptEditor;
 	private final VBox macroEditor;
 
+	private final VBox content = new VBox();
+	private final Label placeholder = new Label(
+		"Select a button in the list on the left to edit it.\n\n" +
+			"Button adds a new one, Separator adds a rule between groups.");
+
 	public ButtonEditorPane(final Context context, final File barDir) {
 		this.context = context;
 		this.barDir = barDir;
@@ -112,12 +117,34 @@ public class ButtonEditorPane extends VBox {
 		macroEditor = buildMacroEditor();
 		actionEditors.getChildren().addAll(commandEditor, scriptEditor,
 			macroEditor);
+		// The three action editors share a StackPane, so exactly one may ever be
+		// visible. Until a button is selected that is none of them.
+		showActionEditor(null);
 
-		getChildren().addAll(buildForm(), new Label("Action"), actionType,
+		content.setSpacing(10);
+		content.getChildren().addAll(buildForm(), new Label("Action"), actionType,
 			actionEditors);
 		VBox.setVgrow(actionEditors, Priority.ALWAYS);
 
-		setDisable(true);
+		placeholder.getStyleClass().add("form-hint");
+		placeholder.setWrapText(true);
+
+		getChildren().addAll(placeholder, content);
+		VBox.setVgrow(content, Priority.ALWAYS);
+
+		showForm(false);
+	}
+
+	/**
+	 * Swaps between the form and the "nothing selected" hint. The form is hidden
+	 * rather than disabled: a greyed-out copy of every field is noise, and an
+	 * empty editor gives no clue that a button has to be selected first.
+	 */
+	private void showForm(final boolean show) {
+		content.setVisible(show);
+		content.setManaged(show);
+		placeholder.setVisible(!show);
+		placeholder.setManaged(!show);
 	}
 
 	public void setOnChange(final Runnable onChange) {
@@ -128,7 +155,7 @@ public class ButtonEditorPane extends VBox {
 	public void setSpec(final ButtonSpec spec, final Palette palette) {
 		this.spec = spec;
 		this.palette = palette;
-		setDisable(spec == null);
+		showForm(spec != null);
 		if (spec == null) return;
 
 		loading = true;
