@@ -66,6 +66,9 @@ public class ActionBarWindow {
 
 	private Runnable onClosed;
 
+	/** The menu currently on screen, so a second right-click replaces it. */
+	private ContextMenu contextMenu;
+
 	public ActionBarWindow(final Context context, final File barDir,
 		final BarConfig config)
 	{
@@ -77,8 +80,16 @@ public class ActionBarWindow {
 		if (prefService != null) ThemeManager.setPrefService(prefService);
 
 		pane = new ActionBarPane(barDir, config, new ActionRunner(context));
-		pane.setOnContextMenuRequested(e -> buildContextMenu().show(pane, e
-			.getScreenX(), e.getScreenY()));
+		pane.setOnContextMenuRequested(e -> {
+			// The menu is rebuilt each time so its checkmarks reflect the current
+			// theme, palette and startup setting. Whatever is already open has to
+			// be dismissed first, or every right-click leaves another popup behind:
+			// a popup does not auto-hide because a different popup opened.
+			if (contextMenu != null) contextMenu.hide();
+			contextMenu = buildContextMenu();
+			contextMenu.show(pane, e.getScreenX(), e.getScreenY());
+			e.consume();
+		});
 
 		final Scene scene = new Scene(pane);
 		ThemeManager.apply(scene);
@@ -88,6 +99,7 @@ public class ActionBarWindow {
 		stage.setScene(scene);
 		stage.setWidth(config.getWidth());
 		stage.setOnHidden(e -> {
+			if (contextMenu != null) contextMenu.hide();
 			ThemeManager.forget(scene);
 			if (onClosed != null) onClosed.run();
 		});
