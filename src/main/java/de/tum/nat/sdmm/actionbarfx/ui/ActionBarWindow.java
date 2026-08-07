@@ -49,6 +49,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 /**
@@ -85,8 +86,10 @@ public class ActionBarWindow {
 			// theme, palette and startup setting. Whatever is already open has to
 			// be dismissed first, or every right-click leaves another popup behind:
 			// a popup does not auto-hide because a different popup opened.
-			if (contextMenu != null) contextMenu.hide();
+			hideContextMenu();
 			contextMenu = buildContextMenu();
+			contextMenu.setAutoHide(true);
+			contextMenu.setHideOnEscape(true);
 			contextMenu.show(pane, e.getScreenX(), e.getScreenY());
 			e.consume();
 		});
@@ -94,12 +97,24 @@ public class ActionBarWindow {
 		final Scene scene = new Scene(pane);
 		ThemeManager.apply(scene);
 
+		// A popup's own auto-hide is not reliable here: a bar is a JavaFX window
+		// living inside an AWT/Swing Fiji, so a click on the main Fiji window or
+		// another application never reaches it. Dismiss the menu on any press
+		// inside the bar, and whenever the bar stops being the focused window.
+		scene.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> hideContextMenu());
+
 		stage = new Stage();
 		stage.setTitle(config.getTitle());
 		stage.setScene(scene);
 		stage.setWidth(config.getWidth());
+		stage.focusedProperty().addListener((obs, was, focused) -> {
+			// Not when the popup itself took the focus, or the menu would close the
+			// instant it opened.
+			if (!focused && contextMenu != null && !contextMenu.isFocused()) //
+				hideContextMenu();
+		});
 		stage.setOnHidden(e -> {
-			if (contextMenu != null) contextMenu.hide();
+			hideContextMenu();
 			ThemeManager.forget(scene);
 			if (onClosed != null) onClosed.run();
 		});
@@ -128,6 +143,10 @@ public class ActionBarWindow {
 
 	public void close() {
 		stage.close();
+	}
+
+	private void hideContextMenu() {
+		if (contextMenu != null && contextMenu.isShowing()) contextMenu.hide();
 	}
 
 	/** Re-reads {@code bar.json} and redraws. */

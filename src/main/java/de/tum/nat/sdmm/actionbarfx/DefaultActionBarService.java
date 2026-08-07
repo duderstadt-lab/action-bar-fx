@@ -55,6 +55,7 @@ import org.scijava.service.Service;
 import org.scijava.ui.event.UIShownEvent;
 
 import de.tum.nat.sdmm.actionbarfx.commands.OpenActionBarCommand;
+import de.tum.nat.sdmm.actionbarfx.legacy.IJ1MenuBridge;
 import de.tum.nat.sdmm.actionbarfx.io.BarIO;
 import de.tum.nat.sdmm.actionbarfx.io.BarLocator;
 import de.tum.nat.sdmm.actionbarfx.model.BarConfig;
@@ -266,6 +267,12 @@ public class DefaultActionBarService extends AbstractService implements
 					.getMessage());
 			}
 		}
+
+		// The module registrations above cover the ImageJ2 UI. Fiji shows the IJ1
+		// menu bar, which needs the entries added to it directly. This does
+		// nothing until that menu bar exists, so the call from initialize() is a
+		// no-op and the one from the UIShownEvent handler is what builds it.
+		IJ1MenuBridge.refresh(found, BarLocator::barName, this::open, log);
 	}
 
 	/**
@@ -338,11 +345,16 @@ public class DefaultActionBarService extends AbstractService implements
 
 	/**
 	 * Startup bars need JavaFX and a visible UI, so they wait for the UI rather
-	 * than opening from {@link #initialize()}.
+	 * than opening from {@link #initialize()}. The Fiji menu bar only exists by
+	 * now too, so this is where the {@code Plugins > Action Bars} submenu is
+	 * actually built.
 	 */
 	@EventHandler
 	protected void onEvent(final UIShownEvent event) {
 		if (!startupBarsOpened.compareAndSet(false, true)) return;
+
+		discoverBars();
+
 		for (final File bar : getStartupBars()) {
 			if (!BarIO.barFile(bar).isFile()) {
 				log.warn("Startup action bar no longer exists: " + bar);

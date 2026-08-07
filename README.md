@@ -173,6 +173,7 @@ de.tum.nat.sdmm.actionbarfx
                 ButtonEditorPane
   commands/     OpenActionBarCommand, NewActionBarCommand, EditActionBarCommand,
                 RescanActionBarsCommand
+  legacy/       IJ1MenuBridge (adds Plugins > Action Bars to Fiji's menu bar)
 ```
 
 Everything in Fiji's menus — IJ1 legacy commands, ImageJ2 commands and script
@@ -184,6 +185,17 @@ from the legacy ActionBar port over by copy-paste.
 The JavaFX toolkit is started lazily on the first bar that is opened, never
 during service initialization: that would cost every user the FX startup whether
 or not they open a bar, and would break headless runs.
+
+Discovered bars are registered twice over, because Fiji has two menus. A
+`CommandInfo` per bar goes to the `ModuleService`, which covers the ImageJ2 UI
+and the search bar. That is not enough for the menu bar Fiji actually shows:
+imagej-legacy builds the IJ1 menu once at startup from
+`commandService.getCommandsOfType(...)`, the annotated commands in the plugin
+index, so modules added at runtime never appear in it no matter how early they
+are registered — and its map is keyed by `CommandInfo.getIdentifier()`, which
+several bars sharing one command class would collide on anyway. So
+`IJ1MenuBridge` builds `Plugins > Action Bars` as AWT menu items directly, once
+the UI is up.
 
 ## License
 
