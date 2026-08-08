@@ -61,10 +61,20 @@ import ij.Menus;
  */
 public final class IJ1MenuBridge {
 
-	/** Submenu under Plugins that lists the discovered bars. */
-	public static final String SUBMENU = "Action Bars";
+	/**
+	 * Submenu under Plugins the bars are listed in. The same one the commands
+	 * live in: a second, near-identically named menu next to it is a coin toss
+	 * every time you reach for either.
+	 */
+	public static final String SUBMENU = "Action Bar FX";
 
 	private static final String PLUGINS_MENU = "Plugins";
+
+	/**
+	 * Marks the items we own, so a rebuild can replace exactly those and leave
+	 * the commands imagej-legacy put in the same submenu alone.
+	 */
+	private static final String OURS = "actionbarfx-discovered-bar";
 
 	private IJ1MenuBridge() {}
 
@@ -121,22 +131,31 @@ public final class IJ1MenuBridge {
 
 		Menu submenu = findSubmenu(plugins);
 		if (submenu == null) {
+			// Not built yet, or this is a plain ImageJ2 without our commands in the
+			// menu. Either way the bars still get somewhere sensible, and
+			// imagej-legacy adds the commands to the same submenu when it gets there.
 			submenu = new Menu(SUBMENU);
 			plugins.add(submenu);
 		}
-		submenu.removeAll();
 
+		// Replace only our own items. Everything else in here belongs to the
+		// commands imagej-legacy registered.
+		for (int i = submenu.getItemCount() - 1; i >= 0; i--)
+			if (OURS.equals(submenu.getItem(i).getName())) submenu.remove(i);
+
+		int index = 0;
 		for (final File bar : bars) {
 			final MenuItem item = new MenuItem(namer.apply(bar));
+			item.setName(OURS);
 			item.addActionListener(e -> onOpen.accept(bar));
-			submenu.add(item);
+			submenu.insert(item, index++);
 		}
 
-		if (bars.isEmpty()) {
-			// An empty submenu looks broken; say why it is empty.
-			final MenuItem none = new MenuItem("(no bars found)");
-			none.setEnabled(false);
-			submenu.add(none);
+		if (!bars.isEmpty()) {
+			// AWT's own separator: Menu.addSeparator() adds exactly this.
+			final MenuItem separator = new MenuItem("-");
+			separator.setName(OURS);
+			submenu.insert(separator, index++);
 		}
 	}
 

@@ -11,10 +11,10 @@ ActionBar plugin.
 ## Using a bar
 
 Drop a bar folder into `Fiji.app/ActionBar/` and it appears under
-**Plugins › Action Bars › \<title\>** after a restart. Hyphens, case and the
-plural do not matter — `ActionBar`, `action-bars` and `Action Bars` are all
-scanned — because getting the folder name slightly wrong should not leave a bar
-silently missing. The scan is logged at startup, so the ImageJ console says
+**Plugins › Action Bar FX › \<title\>** after a restart, listed above the
+commands below. Hyphens, case and the plural do not matter in the folder name —
+`ActionBar`, `action-bars` and `Action Bars` are all scanned — because getting
+it slightly wrong should not leave a bar silently missing. The scan is logged at startup, so the ImageJ console says
 which folder was read and how many bars it held.
 
 Bars are also opened explicitly:
@@ -173,7 +173,7 @@ de.tum.nat.sdmm.actionbarfx
                 ButtonEditorPane
   commands/     OpenActionBarCommand, NewActionBarCommand, EditActionBarCommand,
                 RescanActionBarsCommand
-  legacy/       IJ1MenuBridge (adds Plugins > Action Bars to Fiji's menu bar)
+  legacy/       IJ1MenuBridge (lists the bars in Fiji's own menu bar)
 ```
 
 Everything in Fiji's menus — IJ1 legacy commands, ImageJ2 commands and script
@@ -194,8 +194,9 @@ imagej-legacy builds the IJ1 menu once at startup from
 index, so modules added at runtime never appear in it no matter how early they
 are registered — and its map is keyed by `CommandInfo.getIdentifier()`, which
 several bars sharing one command class would collide on anyway. So
-`IJ1MenuBridge` builds `Plugins > Action Bars` as AWT menu items directly, once
-the UI is up.
+`IJ1MenuBridge` adds the bars to `Plugins > Action Bar FX` as AWT menu items
+directly, once the UI is up. They go above the commands, tagged so a later
+rebuild replaces exactly those items and leaves the commands alone.
 
 ## License
 

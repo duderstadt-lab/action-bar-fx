@@ -286,9 +286,11 @@ public class DefaultActionBarService extends AbstractService implements
 		presets.put("barFile", barDir);
 		info.setPresets(presets);
 
+		// Same submenu the commands live in, so the ImageJ2 UI groups them the way
+		// the Fiji menu bar does.
 		final MenuPath path = new MenuPath();
 		path.add(new MenuEntry("Plugins"));
-		path.add(new MenuEntry("Action Bars"));
+		path.add(new MenuEntry(IJ1MenuBridge.SUBMENU));
 		path.add(new MenuEntry(BarLocator.barName(barDir)));
 		info.setMenuPath(path);
 
@@ -346,7 +348,7 @@ public class DefaultActionBarService extends AbstractService implements
 	/**
 	 * Startup bars need JavaFX and a visible UI, so they wait for the UI rather
 	 * than opening from {@link #initialize()}. The Fiji menu bar only exists by
-	 * now too, so this is where the {@code Plugins > Action Bars} submenu is
+	 * now too, so this is where the {@code Plugins > Action Bar FX} entries are
 	 * actually built.
 	 */
 	@EventHandler
