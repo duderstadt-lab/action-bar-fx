@@ -2,37 +2,83 @@
 
 # action-bar-fx
 
-A Fiji plugin that renders a vertical bar of colored buttons, each launching an
-ImageJ command or a script. JavaFX + AtlantaFX. Replaces the legacy ImageJ
-ActionBar plugin.
+Custom button palettes for Fiji. A bar is a column of colored buttons, each one
+launching an ImageJ command, a script, or an IJ1 macro — the tools of one
+workflow gathered in a single window instead of scattered across the menus.
 
-<img src="images/fret-power-tools.png" width="300"> <img src="images/fret-power-tools-dark.png" width="300">
+<img src="images/fret-power-tools.png" width="290" align="top"> <img src="images/mars-power-tools.png" width="308" align="top">
+
+A replacement for the legacy ImageJ ActionBar plugin, built on JavaFX and
+AtlantaFX.
+
+## Why
+
+A workflow that takes eleven commands takes eleven trips into the menus, and the
+order matters. A bar puts them in front of you in the right order, colored so
+you can find one by eye and numbered when the sequence is part of the protocol.
+
+The two bars above show the difference in intent. **FRET power tools** is a
+protocol: five setup commands, then six numbered steps to work through.
+**Mars power tools** is a toolbox: fourteen commands reached for in any order,
+colored by category with nothing to number. Both ship in
+[ActionBar/](ActionBar).
+
+## Install
+
+Copy `target/action-bar-fx-*.jar` into `Fiji.app/jars/`, then drop a bar folder
+into `Fiji.app/ActionBar/` and restart. The two example bars need
+[Mars](https://duderstadt-lab.github.io/mars-docs/) installed for their command
+buttons.
+
+Hyphens, case and the plural do not matter in the folder name — `ActionBar`,
+`action-bars` and `Action Bars` are all scanned — because getting it slightly
+wrong should not leave a bar silently missing. The scan is logged at startup, so
+the ImageJ console says which folder was read and how many bars it held.
 
 ## Using a bar
 
-Drop a bar folder into `Fiji.app/ActionBar/` and it appears under
-**Plugins › Action Bar FX › \<title\>** after a restart, listed above the
-commands below. Hyphens, case and the plural do not matter in the folder name —
-`ActionBar`, `action-bars` and `Action Bars` are all scanned — because getting
-it slightly wrong should not leave a bar silently missing. The scan is logged at startup, so the ImageJ console says
-which folder was read and how many bars it held.
+Each discovered bar appears under **Plugins › Action Bar FX › \<title\>**, listed
+above the commands:
 
-Bars are also opened explicitly:
+- **Open bar…** — open any bar folder
+- **New bar…** — create one and open the builder
+- **Edit bar…** — open the builder on an existing bar
+- **Rescan action bars** — pick up a folder dropped in after Fiji started
 
-- **Plugins › Action Bar FX › Open bar…** — pick any bar folder
-- **Plugins › Action Bar FX › New bar…** — create one and open the builder
-- **Plugins › Action Bar FX › Edit bar…** — open the builder on an existing bar
-- **Plugins › Action Bar FX › Rescan action bars** — pick up a folder that was
-  dropped in after Fiji started, without restarting
+**Right-click a bar** for **Dark theme**, **Palette**, **Edit bar…**,
+**Reload**, **Open when Fiji starts** and **Close bar**.
 
-**Right-click a bar** for everything else: **Dark theme** (remembered between
-sessions, applies to every open bar), **Palette**, **Edit bar…**, **Reload**,
-and **Open when Fiji starts**.
+Clicking a button runs the command exactly as the menu would, parameter dialog
+and all. The button disables itself and shows a spinner until the command
+finishes, so a slow step looks busy rather than ignored. If it fails, the bar
+says so itself — a toast and a red outline on the button — rather than only
+writing to the console.
 
-The shipped example is `ActionBar/fret-power-tools`, the FRET Power Tools bar
-from the [Mars docs](https://duderstadt-lab.github.io/mars-docs/tutorials/fretActionBar/)
-ported over. Copy that folder into `Fiji.app/ActionBar/` to try it. It needs
-Mars installed for the five command buttons.
+The theme is remembered between sessions and applies to every open bar. Because
+a button stores one base color and every state derives from it, the same bar
+reads correctly in both:
+
+<img src="images/mars-power-tools.png" width="290" align="top"> <img src="images/mars-power-tools-dark.png" width="290" align="top">
+
+## Making a bar
+
+**Plugins › Action Bar FX › New bar…** asks for a title and a folder, then opens
+the builder: rows on the left, the editor in the middle, a live preview of the
+bar on the right.
+
+Each button has a label, an optional step badge, a color, an icon and an action.
+The action is one of three:
+
+- **command** — anything in Fiji's menus. *Choose command…* browses the whole
+  menu tree with a filter that flattens to matching entries as you type.
+- **script** — a script file. One picked from elsewhere is copied into the bar's
+  `scripts/` folder, so the bar stays self-contained.
+- **ij1** — a raw IJ1 macro string, mainly so macros from the legacy ActionBar
+  port over by copy-paste.
+
+Icons are [Ikonli](https://kordamp.org/ikonli/) Material Design 2 literals. The
+picker shows all ~7,500 as a grid with a search box and category tabs; names
+appear on hover and for the current selection, and a double-click picks one.
 
 ## Bar format
 
@@ -86,7 +132,7 @@ Rules:
 - `paletteIndex` is the source of truth for color; `color` is an optional hex
   override. Switching the bar palette recolors everything without an override.
 - `action.path` is relative to the bar folder, which is what keeps the folder
-  portable. The builder copies a script picked from elsewhere into `scripts/`.
+  portable.
 - `action.class` is resolved first; `menuPath` is a fallback and a
   human-readable hint. Menu paths get reorganized between releases; class names
   do not.
@@ -94,11 +140,6 @@ Rules:
   slot, so labels line up across the bar.
 - Fields this build does not recognize are preserved on save, so a bar written
   by a newer version is not stripped when an older one re-saves it.
-
-Icons are [Ikonli](https://kordamp.org/ikonli/) Material Design 2 literals
-(`mdi2t-tag-outline`). The builder's picker shows all ~7,500 of them as a grid
-with a search box and category tabs; names appear on hover and for the current
-selection. Double-click an icon to pick it.
 
 ### Palettes
 
@@ -121,25 +162,18 @@ Six are shipped, in
 
 In the builder, the bar's palette is the dropdown at the top; the button's color
 is the row of swatches under **Color** — click one to assign it. The last swatch
-(`—`) means "no palette color", which draws a neutral gray; it is what a button
-gets when you have not chosen yet. **Override with a custom color** is the escape
-hatch for a one-off hue that should survive a palette switch.
+(`—`) means "no palette color", which draws a neutral gray. **Override with a
+custom color** is the escape hatch for a one-off hue that should survive a
+palette switch.
 
-ActionBarFX styles only its own windows. The AtlantaFX base theme goes on each
-bar scene with `Scene.setUserAgentStylesheet`, never
-`Application.setUserAgentStylesheet` — the latter is global to the JVM, and a
-bar is a guest in a Fiji full of other people's JavaFX windows. Setting it
-globally replaced Modena everywhere the moment a bar opened, breaking every
-stylesheet written against Modena.
-
-Each button ends up with one base color, and every visual state derives from it
-in CSS, so one hue works in both themes: `ladder()` picks the text color in light
-mode, and dark mode darkens the same hue rather than remapping it — the color
-coding is the identity of a button.
+Buttons that belong together can share one palette entry. That is what makes the
+Mars bar read as four groups rather than fourteen unrelated buttons, and it
+survives a palette switch.
 
 ## Scripting
 
-The service is registered as a script alias:
+The service is registered as a script alias, so a Groovy script can open or
+reload a bar:
 
 ```groovy
 #@ ActionBarService actionBars
@@ -154,8 +188,7 @@ actionBars.reload(new File("/path/to/fret-power-tools"))
 mvn clean package
 ```
 
-Java 21, JavaFX 23 (what Fiji ships). Copy `target/action-bar-fx-*.jar` into
-`Fiji.app/jars/`.
+Java 21 and JavaFX 23, matching what Fiji ships.
 
 To work on the look of a bar without starting Fiji, there is a standalone
 preview with live stylesheet reload through CSSFX:
@@ -164,7 +197,7 @@ preview with live stylesheet reload through CSSFX:
 mvn -q test-compile exec:java -Dexec.classpathScope=test -Dexec.mainClass=de.tum.nat.sdmm.actionbarfx.ui.ActionBarPreview -Dexec.args=ActionBar/fret-power-tools
 ```
 
-## Layout
+## How it works
 
 ```
 de.tum.nat.sdmm.actionbarfx
@@ -183,27 +216,34 @@ de.tum.nat.sdmm.actionbarfx
   legacy/       IJ1MenuBridge (lists the bars in Fiji's own menu bar)
 ```
 
-Everything in Fiji's menus — IJ1 legacy commands, ImageJ2 commands and script
-files — is a `ModuleInfo`, so one code path runs all of them through
-`moduleService.run(info, true)`, which means the normal parameter dialog
-appears. Raw IJ1 macro strings are the exception, and exist mainly so macros
-from the legacy ActionBar port over by copy-paste.
+**One path for every action.** Everything in Fiji's menus — IJ1 legacy commands,
+ImageJ2 commands and script files alike — is registered as a `ModuleInfo`, so
+all three run through `moduleService.run(info, true)`, which is what makes the
+normal parameter dialog appear. Raw IJ1 macro strings are the exception.
 
-The JavaFX toolkit is started lazily on the first bar that is opened, never
-during service initialization: that would cost every user the FX startup whether
-or not they open a bar, and would break headless runs.
+**JavaFX starts lazily**, on the first bar opened, never during service
+initialization: starting it at startup would cost every user the toolkit whether
+or not they ever open a bar, and would break headless runs. For the same reason
+`initialize()` resolves no commands — the IJ1 legacy layer may not have
+registered them yet — and never throws, so a malformed `bar.json` is a logged
+warning rather than a Fiji that will not start.
 
-Discovered bars are registered twice over, because Fiji has two menus. A
-`CommandInfo` per bar goes to the `ModuleService`, which covers the ImageJ2 UI
-and the search bar. That is not enough for the menu bar Fiji actually shows:
-imagej-legacy builds the IJ1 menu once at startup from
-`commandService.getCommandsOfType(...)`, the annotated commands in the plugin
-index, so modules added at runtime never appear in it no matter how early they
-are registered — and its map is keyed by `CommandInfo.getIdentifier()`, which
-several bars sharing one command class would collide on anyway. So
-`IJ1MenuBridge` adds the bars to `Plugins > Action Bar FX` as AWT menu items
-directly, once the UI is up. They go above the commands, tagged so a later
-rebuild replaces exactly those items and leaves the commands alone.
+**Bars are registered twice**, because Fiji has two menus. A `CommandInfo` per
+bar goes to the `ModuleService`, which covers the ImageJ2 UI and the search bar.
+That is not enough for the menu bar Fiji actually shows: imagej-legacy builds
+the IJ1 menu once at startup from `commandService.getCommandsOfType(...)`, the
+annotated commands in the plugin index, so modules added at runtime never appear
+there however early they are registered. `IJ1MenuBridge` therefore adds the bars
+to `Plugins › Action Bar FX` as AWT menu items directly, tagged so a later
+rebuild replaces exactly those and leaves the commands alone.
+
+**Styling stays inside our own windows.** The AtlantaFX base theme goes on each
+bar scene with `Scene.setUserAgentStylesheet`, never
+`Application.setUserAgentStylesheet` — the latter is global to the JVM and
+replaces Modena for every JavaFX window in the process, breaking any stylesheet
+written against it. In the other direction, a bar puts its own stylesheets back
+if another plugin clears them. Fiji is one JVM shared with other people's
+windows, and both halves are needed to be a good guest in it.
 
 ## License
 
