@@ -28,7 +28,9 @@
  */
 package de.tum.nat.sdmm.actionbarfx.ui;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.prefs.Preferences;
@@ -37,6 +39,8 @@ import org.scijava.prefs.PrefService;
 
 import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
+import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
@@ -105,8 +109,9 @@ public final class ThemeManager {
 	 * later theme switches reach it too.
 	 */
 	public static synchronized void apply(final Scene scene) {
-		SCENES.add(scene);
+		final boolean isNew = SCENES.add(scene);
 		style(scene);
+		if (isNew) defend(scene);
 	}
 
 	public static synchronized void forget(final Scene scene) {
@@ -133,6 +138,34 @@ public final class ThemeManager {
 		applyBaseTheme(scene);
 		scene.getStylesheets().setAll(url(BASE_CSS), url(isDark() ? DARK_CSS
 			: LIGHT_CSS));
+	}
+
+	/**
+	 * Puts our stylesheets back if something else replaces them.
+	 * <p>
+	 * A scene's stylesheet list belongs to whoever created the window, but Fiji
+	 * is one JVM shared with other JavaFX plugins, and a plugin that themes
+	 * "every open Stage" will clear this one too — leaving a bar with no styling
+	 * at all and someone else's CSS resolving against the wrong base theme. Ours
+	 * is the only window we can speak for, so we put it back.
+	 * <p>
+	 * This cannot ping-pong: it only reacts when the list no longer holds what we
+	 * put there, and restoring it is what we would have set anyway.
+	 */
+	private static void defend(final Scene scene) {
+		scene.getStylesheets().addListener((ListChangeListener<String>) change -> {
+			final List<String> wanted = Arrays.asList(url(BASE_CSS), url(isDark()
+				? DARK_CSS : LIGHT_CSS));
+			if (scene.getStylesheets().equals(wanted)) return;
+			// Re-entrant edits of an observable list under its own listener are
+			// not allowed, so restore on the next pulse.
+			Platform.runLater(() -> {
+				if (!scene.getStylesheets().equals(wanted)) {
+					applyBaseTheme(scene);
+					scene.getStylesheets().setAll(wanted);
+				}
+			});
+		});
 	}
 
 	/**
