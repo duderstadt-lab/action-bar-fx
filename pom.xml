@@ -10,12 +10,12 @@
 	</parent>
 
 	<groupId>de.tum.nat.sdmm</groupId>
-	<artifactId>actionbar-fx</artifactId>
+	<artifactId>action-bar-fx</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
 
-	<name>actionbar-fx</name>
+	<name>action-bar-fx</name>
 	<description>JavaFX action bars for Fiji. Vertical bars of colored buttons that launch ImageJ commands and scripts.</description>
-	<url>https://github.com/duderstadt-lab/ActionBarFX</url>
+	<url>https://github.com/duderstadt-lab/action-bar-fx</url>
 	<inceptionYear>2026</inceptionYear>
 	<organization>
 		<name>TUM School of Natural Sciences, Structure and Dynamics of Molecular Machines</name>
@@ -59,18 +59,18 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:git:https://github.com/duderstadt-lab/ActionBarFX</connection>
-		<developerConnection>scm:git:git@github.com:duderstadt-lab/ActionBarFX</developerConnection>
+		<connection>scm:git:https://github.com/duderstadt-lab/action-bar-fx</connection>
+		<developerConnection>scm:git:git@github.com:duderstadt-lab/action-bar-fx</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/duderstadt-lab/ActionBarFX</url>
+		<url>https://github.com/duderstadt-lab/action-bar-fx</url>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/duderstadt-lab/ActionBarFX/issues</url>
+		<url>https://github.com/duderstadt-lab/action-bar-fx/issues</url>
 	</issueManagement>
 	<ciManagement>
 		<system>GitHub Actions</system>
-		<url>https://github.com/duderstadt-lab/ActionBarFX/actions</url>
+		<url>https://github.com/duderstadt-lab/action-bar-fx/actions</url>
 	</ciManagement>
 
 	<properties>

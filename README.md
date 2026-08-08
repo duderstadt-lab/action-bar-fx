@@ -1,6 +1,6 @@
-[![](https://github.com/duderstadt-lab/ActionBarFX/actions/workflows/build-main.yml/badge.svg)](https://github.com/duderstadt-lab/ActionBarFX/actions/workflows/build-main.yml)
+[![](https://github.com/duderstadt-lab/action-bar-fx/actions/workflows/build-main.yml/badge.svg)](https://github.com/duderstadt-lab/action-bar-fx/actions/workflows/build-main.yml)
 
-# ActionBarFX
+# action-bar-fx
 
 A Fiji plugin that renders a vertical bar of colored buttons, each launching an
 ImageJ command or a script. JavaFX + AtlantaFX. Replaces the legacy ImageJ
@@ -154,7 +154,7 @@ actionBars.reload(new File("/path/to/fret-power-tools"))
 mvn clean package
 ```
 
-Java 21, JavaFX 23 (what Fiji ships). Copy `target/actionbar-fx-*.jar` into
+Java 21, JavaFX 23 (what Fiji ships). Copy `target/action-bar-fx-*.jar` into
 `Fiji.app/jars/`.
 
 To work on the look of a bar without starting Fiji, there is a standalone
