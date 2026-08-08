@@ -125,6 +125,13 @@ is the row of swatches under **Color** — click one to assign it. The last swat
 gets when you have not chosen yet. **Override with a custom color** is the escape
 hatch for a one-off hue that should survive a palette switch.
 
+ActionBarFX styles only its own windows. The AtlantaFX base theme goes on each
+bar scene with `Scene.setUserAgentStylesheet`, never
+`Application.setUserAgentStylesheet` — the latter is global to the JVM, and a
+bar is a guest in a Fiji full of other people's JavaFX windows. Setting it
+globally replaced Modena everywhere the moment a bar opened, breaking every
+stylesheet written against Modena.
+
 Each button ends up with one base color, and every visual state derives from it
 in CSS, so one hue works in both themes: `ladder()` picks the text color in light
 mode, and dark mode darkens the same hue rather than remapping it — the color

@@ -37,7 +37,6 @@ import org.scijava.prefs.PrefService;
 
 import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
-import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
@@ -122,13 +121,34 @@ public final class ThemeManager {
 	public static synchronized void applyStylesheets(final Parent parent) {
 		parent.getStylesheets().setAll(url(BASE_CSS), url(isDark() ? DARK_CSS
 			: LIGHT_CSS));
+
+		// A dialog has no scene until it is shown, so wait for one.
+		if (parent.getScene() != null) applyBaseTheme(parent.getScene());
+		else parent.sceneProperty().addListener((obs, old, scene) -> {
+			if (scene != null) applyBaseTheme(scene);
+		});
 	}
 
 	private static void style(final Scene scene) {
-		Application.setUserAgentStylesheet(isDark() ? new PrimerDark()
-			.getUserAgentStylesheet() : new PrimerLight().getUserAgentStylesheet());
+		applyBaseTheme(scene);
 		scene.getStylesheets().setAll(url(BASE_CSS), url(isDark() ? DARK_CSS
 			: LIGHT_CSS));
+	}
+
+	/**
+	 * Puts the AtlantaFX base theme on one scene.
+	 * <p>
+	 * Deliberately {@code Scene.setUserAgentStylesheet} and never
+	 * {@code Application.setUserAgentStylesheet}: the latter is global to the
+	 * JVM, and a bar is a guest in a Fiji full of other people's JavaFX windows.
+	 * Setting it globally replaced Modena everywhere the moment a bar opened,
+	 * which broke every stylesheet written against Modena — mars-fx's among them,
+	 * with "Could not resolve '-fx-text-base-color'" and windows that changed
+	 * appearance. Per scene, ActionBarFX styles only its own windows.
+	 */
+	private static void applyBaseTheme(final Scene scene) {
+		scene.setUserAgentStylesheet(isDark() ? new PrimerDark()
+			.getUserAgentStylesheet() : new PrimerLight().getUserAgentStylesheet());
 	}
 
 	private static String url(final String resource) {
