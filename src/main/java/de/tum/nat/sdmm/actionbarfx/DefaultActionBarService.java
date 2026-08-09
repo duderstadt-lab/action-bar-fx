@@ -58,6 +58,7 @@ import de.tum.nat.sdmm.actionbarfx.commands.OpenActionBarCommand;
 import de.tum.nat.sdmm.actionbarfx.legacy.IJ1MenuBridge;
 import de.tum.nat.sdmm.actionbarfx.io.BarIO;
 import de.tum.nat.sdmm.actionbarfx.io.BarLocator;
+import de.tum.nat.sdmm.actionbarfx.io.BundledBars;
 import de.tum.nat.sdmm.actionbarfx.model.BarConfig;
 import de.tum.nat.sdmm.actionbarfx.ui.ActionBarWindow;
 import de.tum.nat.sdmm.actionbarfx.ui.FxBootstrap;
@@ -88,6 +89,9 @@ public class DefaultActionBarService extends AbstractService implements
 {
 
 	private static final String STARTUP_BARS_KEY = "startupBars";
+
+	/** Example bars already written out, so a deleted one is not reinstated. */
+	private static final String INSTALLED_BARS_KEY = "installedExampleBars";
 
 	@Parameter
 	private ModuleService moduleService;
@@ -252,6 +256,8 @@ public class DefaultActionBarService extends AbstractService implements
 			registered.clear();
 		}
 
+		installBundledBars();
+
 		final List<File> scanDirs = BarLocator.scanDirectories(context());
 		final List<File> found = BarLocator.findAllBars(scanDirs);
 		log.info("ActionBarFX: scanned " + (scanDirs.isEmpty() ? "nothing (no " +
@@ -273,6 +279,36 @@ public class DefaultActionBarService extends AbstractService implements
 		// nothing until that menu bar exists, so the call from initialize() is a
 		// no-op and the one from the UIShownEvent handler is what builds it.
 		IJ1MenuBridge.refresh(found, BarLocator::barName, this::open, log);
+	}
+
+	/**
+	 * Writes the example bars into the scan folder the first time, so installing
+	 * the jar leaves something in the menu rather than an empty submenu.
+	 * <p>
+	 * Only bars whose folder does not exist are written, so this never overwrites
+	 * an edit. Nothing is opened: a bar appears in the menu, and it is up to the
+	 * user whether to open it or mark it to open at startup.
+	 */
+	private void installBundledBars() {
+		final File scanDir = getScanDirectory();
+		if (!scanDir.isDirectory() && !scanDir.mkdirs()) {
+			log.debug("ActionBarFX: no scan folder and could not create " + scanDir);
+			return;
+		}
+
+		// Remember what has been installed, so a bar someone deleted stays
+		// deleted rather than reappearing at every start.
+		final List<String> installedBefore = new ArrayList<>(splitPaths(prefService
+			.get(ActionBarService.class, INSTALLED_BARS_KEY, "")));
+
+		final List<File> written = BundledBars.installMissing(scanDir,
+			installedBefore, log);
+		if (written.isEmpty()) return;
+
+		for (final File bar : written)
+			installedBefore.add(bar.getName());
+		prefService.put(ActionBarService.class, INSTALLED_BARS_KEY, String.join(
+			File.pathSeparator, installedBefore));
 	}
 
 	/**
@@ -367,6 +403,15 @@ public class DefaultActionBarService extends AbstractService implements
 	}
 
 	// -- Helper methods --
+
+	/** Splits a preference holding several entries joined by the path separator. */
+	private static List<String> splitPaths(final String value) {
+		final List<String> parts = new ArrayList<>();
+		if (value == null || value.isEmpty()) return parts;
+		for (final String part : value.split(File.pathSeparator))
+			if (!part.trim().isEmpty()) parts.add(part.trim());
+		return parts;
+	}
 
 	private String key(final File barDir) {
 		try {

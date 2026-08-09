@@ -306,6 +306,18 @@
 	</profiles>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<!-- The example bars ship inside the jar and are unpacked into the
+			     scan folder on first start. Packaged straight from the folder they
+			     live in, so the repository keeps exactly one copy of each bar. -->
+			<resource>
+				<directory>ActionBar</directory>
+				<targetPath>de/tum/nat/sdmm/actionbarfx/bars</targetPath>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

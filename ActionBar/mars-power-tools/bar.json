@@ -2,154 +2,173 @@
   "formatVersion" : 1,
   "title" : "Mars power tools",
   "palette" : "okabe-ito",
-  "width" : 340,
-  "items" : [ {
-    "type" : "button",
-    "label" : "Dataset Explorer",
-    "paletteIndex" : 4,
-    "icon" : "mdi2f-folder-search-outline",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.fx.dialogs.s3.command.DatasetExplorerCommand",
-      "menuPath" : "Plugins>Mars>Molecule>Dataset Explorer"
+  "width" : 340.0,
+  "items" : [
+    {
+      "type" : "button",
+      "label" : "Dataset Explorer",
+      "paletteIndex" : 4,
+      "icon" : "mdi2f-folder-search-outline",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins>Mars>Molecule>Dataset Explorer",
+        "class" : "de.mpg.biochem.mars.fx.dialogs.s3.command.DatasetExplorerCommand"
+      }
+    },
+    {
+      "type" : "separator"
+    },
+    {
+      "type" : "button",
+      "label" : "Open Archive",
+      "paletteIndex" : 2,
+      "icon" : "mdi2a-archive-outline",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins>Mars>Molecule>Open Archive",
+        "class" : "de.mpg.biochem.mars.molecule.commands.ImportMoleculeArchiveCommand"
+      }
+    },
+    {
+      "type" : "button",
+      "label" : "Open Archive (S3)",
+      "paletteIndex" : 2,
+      "icon" : "mdi2c-cloud-download-outline",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins>Mars>Molecule>Open Archive (S3)",
+        "class" : "de.mpg.biochem.mars.fx.dialogs.s3.command.OpenCloudArchiveCommand"
+      }
+    },
+    {
+      "type" : "button",
+      "label" : "Open Virtual Store",
+      "paletteIndex" : 2,
+      "icon" : "mdi2d-database-outline",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins>Mars>Molecule>Open Virtual Store",
+        "class" : "de.mpg.biochem.mars.molecule.commands.ImportVirtualStoreCommand"
+      }
+    },
+    {
+      "type" : "button",
+      "label" : "Merge Archives",
+      "paletteIndex" : 2,
+      "icon" : "mdi2s-source-merge",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins>Mars>Molecule>Merge Archives",
+        "class" : "de.mpg.biochem.mars.molecule.commands.MergeCommand"
+      }
+    },
+    {
+      "type" : "button",
+      "label" : "Merge Virtual Stores",
+      "paletteIndex" : 2,
+      "icon" : "mdi2c-call-merge",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins>Mars>Molecule>Merge Virtual Stores",
+        "class" : "de.mpg.biochem.mars.molecule.commands.MergeVirtualStoresCommand"
+      }
+    },
+    {
+      "type" : "separator"
+    },
+    {
+      "type" : "button",
+      "label" : "Peak Finder",
+      "paletteIndex" : 0,
+      "icon" : "mdi2c-chart-bell-curve",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins>Mars>Image>Peak Finder",
+        "class" : "de.mpg.biochem.mars.image.commands.PeakFinderCommand"
+      }
+    },
+    {
+      "type" : "button",
+      "label" : "Peak Tracker",
+      "paletteIndex" : 0,
+      "icon" : "mdi2c-chart-timeline-variant",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins>Mars>Image>Peak Tracker",
+        "class" : "de.mpg.biochem.mars.image.commands.PeakTrackerCommand"
+      }
+    },
+    {
+      "type" : "button",
+      "label" : "Object Tracker",
+      "paletteIndex" : 0,
+      "icon" : "mdi2v-vector-square",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins>Mars>Image>Object Tracker",
+        "class" : "de.mpg.biochem.mars.object.commands.ObjectTrackerCommand"
+      }
+    },
+    {
+      "type" : "button",
+      "label" : "Molecule Integrator",
+      "paletteIndex" : 0,
+      "icon" : "mdi2s-sigma",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins>Mars>Image>Molecule Integrator",
+        "class" : "de.mpg.biochem.mars.image.commands.MoleculeIntegratorCommand"
+      }
+    },
+    {
+      "type" : "button",
+      "label" : "Molecule Integrator (multiview)",
+      "paletteIndex" : 0,
+      "icon" : "mdi2v-view-grid-outline",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins>Mars>Image>Molecule Integrator (multiview)",
+        "class" : "de.mpg.biochem.mars.image.commands.MoleculeIntegratorMultiViewCommand"
+      }
+    },
+    {
+      "type" : "separator"
+    },
+    {
+      "type" : "button",
+      "label" : "Change Point Finder",
+      "paletteIndex" : 6,
+      "icon" : "mdi2s-stairs",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins>Mars>KCP>Change Point Finder",
+        "class" : "de.mpg.biochem.mars.kcp.commands.KCPCommand"
+      }
+    },
+    {
+      "type" : "button",
+      "label" : "Single Change Point Finder",
+      "paletteIndex" : 6,
+      "icon" : "mdi2s-stairs-up",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins>Mars>KCP>Single Change Point Finder",
+        "class" : "de.mpg.biochem.mars.kcp.commands.SingleChangePointFinder"
+      }
+    },
+    {
+      "type" : "separator"
+    },
+    {
+      "type" : "button",
+      "label" : "Open N5 as ImagePlus (s3)",
+      "paletteIndex" : 5,
+      "icon" : "mdi2c-cube-outline",
+      "action" : {
+        "type" : "command",
+        "menuPath" : "Plugins > Mars > Import > Open N5 as ImagePlus (S3)",
+        "class" : "de.mpg.biochem.mars.fx.dialogs.n5.command.OpenN5asImagePlusCommand"
+      }
     }
-  }, {
-    "type" : "separator"
-  }, {
-    "type" : "button",
-    "label" : "Open Archive",
-    "paletteIndex" : 2,
-    "icon" : "mdi2a-archive-outline",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.molecule.commands.ImportMoleculeArchiveCommand",
-      "menuPath" : "Plugins>Mars>Molecule>Open Archive"
-    }
-  }, {
-    "type" : "button",
-    "label" : "Open Archive (S3)",
-    "paletteIndex" : 2,
-    "icon" : "mdi2c-cloud-download-outline",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.fx.dialogs.s3.command.OpenCloudArchiveCommand",
-      "menuPath" : "Plugins>Mars>Molecule>Open Archive (S3)"
-    }
-  }, {
-    "type" : "button",
-    "label" : "Open Virtual Store",
-    "paletteIndex" : 2,
-    "icon" : "mdi2d-database-outline",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.molecule.commands.ImportVirtualStoreCommand",
-      "menuPath" : "Plugins>Mars>Molecule>Open Virtual Store"
-    }
-  }, {
-    "type" : "button",
-    "label" : "Merge Archives",
-    "paletteIndex" : 2,
-    "icon" : "mdi2s-source-merge",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.molecule.commands.MergeCommand",
-      "menuPath" : "Plugins>Mars>Molecule>Merge Archives"
-    }
-  }, {
-    "type" : "button",
-    "label" : "Merge Virtual Stores",
-    "paletteIndex" : 2,
-    "icon" : "mdi2c-call-merge",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.molecule.commands.MergeVirtualStoresCommand",
-      "menuPath" : "Plugins>Mars>Molecule>Merge Virtual Stores"
-    }
-  }, {
-    "type" : "separator"
-  }, {
-    "type" : "button",
-    "label" : "Peak Finder",
-    "paletteIndex" : 0,
-    "icon" : "mdi2c-chart-bell-curve",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.image.commands.PeakFinderCommand",
-      "menuPath" : "Plugins>Mars>Image>Peak Finder"
-    }
-  }, {
-    "type" : "button",
-    "label" : "Peak Tracker",
-    "paletteIndex" : 0,
-    "icon" : "mdi2c-chart-timeline-variant",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.image.commands.PeakTrackerCommand",
-      "menuPath" : "Plugins>Mars>Image>Peak Tracker"
-    }
-  }, {
-    "type" : "button",
-    "label" : "Object Tracker",
-    "paletteIndex" : 0,
-    "icon" : "mdi2v-vector-square",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.object.commands.ObjectTrackerCommand",
-      "menuPath" : "Plugins>Mars>Image>Object Tracker"
-    }
-  }, {
-    "type" : "button",
-    "label" : "Molecule Integrator",
-    "paletteIndex" : 0,
-    "icon" : "mdi2s-sigma",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.image.commands.MoleculeIntegratorCommand",
-      "menuPath" : "Plugins>Mars>Image>Molecule Integrator"
-    }
-  }, {
-    "type" : "button",
-    "label" : "Molecule Integrator (multiview)",
-    "paletteIndex" : 0,
-    "icon" : "mdi2v-view-grid-outline",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.image.commands.MoleculeIntegratorMultiViewCommand",
-      "menuPath" : "Plugins>Mars>Image>Molecule Integrator (multiview)"
-    }
-  }, {
-    "type" : "separator"
-  }, {
-    "type" : "button",
-    "label" : "Change Point Finder",
-    "paletteIndex" : 6,
-    "icon" : "mdi2s-stairs",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.kcp.commands.KCPCommand",
-      "menuPath" : "Plugins>Mars>KCP>Change Point Finder"
-    }
-  }, {
-    "type" : "button",
-    "label" : "Single Change Point Finder",
-    "paletteIndex" : 6,
-    "icon" : "mdi2s-stairs-up",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.kcp.commands.SingleChangePointFinder",
-      "menuPath" : "Plugins>Mars>KCP>Single Change Point Finder"
-    }
-  }, {
-    "type" : "separator"
-  }, {
-    "type" : "button",
-    "label" : "Open N5 as ImagePlus (minio)",
-    "paletteIndex" : 5,
-    "icon" : "mdi2c-cube-outline",
-    "action" : {
-      "type" : "command",
-      "class" : "de.mpg.biochem.mars.n5.commands.MarsOpenN5asImagePlusCommand",
-      "menuPath" : "Plugins>Mars>Import>Open N5 as ImagePlus (minio)"
-    }
-  } ]
+  ]
 }

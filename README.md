@@ -25,10 +25,15 @@ colored by category with nothing to number. Both ship in
 
 ## Install
 
-Copy `target/action-bar-fx-*.jar` into `Fiji.app/jars/`, then drop a bar folder
-into `Fiji.app/ActionBar/` and restart. The two example bars need
+Copy `target/action-bar-fx-*.jar` into `Fiji.app/jars/` and restart. Both
+example bars ship inside the jar and are written into `Fiji.app/ActionBar/` on
+first start, so they appear in the menu straight away — neither is opened until
+you ask for it. They need
 [Mars](https://duderstadt-lab.github.io/mars-docs/) installed for their command
 buttons.
+
+Each is installed once and then left alone: an edited bar is never overwritten,
+and a deleted one does not come back. Your own bars go in the same folder.
 
 Hyphens, case and the plural do not matter in the folder name — `ActionBar`,
 `action-bars` and `Action Bars` are all scanned — because getting it slightly
@@ -205,7 +210,8 @@ de.tum.nat.sdmm.actionbarfx
   DefaultActionBarService     @Plugin(type = Service.class)
   model/        BarConfig, BarItem, ButtonSpec, SeparatorSpec, ActionSpec,
                 Palette, PaletteRegistry
-  io/           BarIO (Jackson load/save), BarLocator (finds the scan folders)
+  io/           BarIO (Jackson load/save), BarLocator (finds the scan folders),
+                BundledBars (unpacks the shipped bars on first start)
   run/          ActionRunner (command | script | ij1 -> ModuleInfo -> run)
   ui/           ActionBarWindow, ActionBarPane, ActionButton, HoverEffect,
                 ThemeManager, Toast, FxBootstrap
