@@ -111,6 +111,18 @@ public class IconPickerPane extends VBox {
 		grid.setFocusTraversable(false);
 		VBox.setVgrow(grid, Priority.ALWAYS);
 
+		// An empty grid with no explanation is the worst outcome here: the pack
+		// is a separate jar, and when it is missing there is nothing on screen to
+		// say so.
+		final Label empty = new Label(icons().isEmpty()
+			? "No icons available.\n\nThe Material Design 2 pack is not installed. " +
+				"Add ikonli-materialdesign2-pack to Fiji's jars folder, alongside " +
+				"action-bar-fx." : "No icons match.");
+		empty.setWrapText(true);
+		empty.setMaxWidth(320);
+		empty.getStyleClass().add("form-hint");
+		grid.setPlaceholder(empty);
+
 		selectionLabel.getStyleClass().add("icon-selection");
 
 		getChildren().addAll(filterField, buildCategoryTabs(), grid,

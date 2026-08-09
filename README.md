@@ -32,8 +32,13 @@ you ask for it. They need
 [Mars](https://duderstadt-lab.github.io/mars-docs/) installed for their command
 buttons.
 
-Each is installed once and then left alone: an edited bar is never overwritten,
-and a deleted one does not come back. Your own bars go in the same folder.
+Each is installed once per Fiji installation and then left alone: an edited bar
+is never overwritten, and a deleted one does not come back. Your own bars go in
+the same folder.
+
+Icons come from `ikonli-materialdesign2-pack`, which is a separate jar. Without
+it the buttons draw without icons and the icon picker is empty, so make sure it
+travels with `action-bar-fx` — an update site needs it uploaded too.
 
 Hyphens, case and the plural do not matter in the folder name — `ActionBar`,
 `action-bars` and `Action Bars` are all scanned — because getting it slightly

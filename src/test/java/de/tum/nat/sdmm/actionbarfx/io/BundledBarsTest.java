@@ -121,7 +121,7 @@ public class BundledBarsTest {
 	{
 		final List<String> installed = new java.util.ArrayList<>();
 		for (final File bar : BundledBars.installMissing(scanDir.toFile(),
-			installed, log)) installed.add(bar.getName());
+			installed, log)) installed.add(BundledBars.recordKey(bar));
 		assertEquals(2, installed.size());
 
 		// Someone decides they do not want this one.
@@ -138,6 +138,25 @@ public class BundledBarsTest {
 		assertEquals(1, BundledBars.installMissing(scanDir.toFile(), List.of(),
 			log).size());
 		assertTrue(scanDir.resolve("fret-power-tools").toFile().isDirectory());
+	}
+
+	@Test
+	public void aSecondFijiOnTheSameMachineStillGetsTheBars(
+		@TempDir final Path firstFiji, @TempDir final Path secondFiji)
+		throws IOException
+	{
+		// Preferences are per user, not per installation, so the record from one
+		// Fiji must not make another one skip the bars. Installing a second Fiji
+		// to test with is exactly when this bites.
+		final List<String> record = new java.util.ArrayList<>();
+		for (final File bar : BundledBars.installMissing(firstFiji.toFile(), record,
+			log)) record.add(BundledBars.recordKey(bar));
+		assertEquals(2, record.size());
+
+		final List<File> second = BundledBars.installMissing(secondFiji.toFile(),
+			record, log);
+		assertEquals(2, second.size(), "A second installation gets its own bars.");
+		assertEquals(2, BarLocator.findBars(secondFiji.toFile()).size());
 	}
 
 	@Test

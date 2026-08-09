@@ -69,10 +69,11 @@ public final class BundledBars {
 
 	/**
 	 * Copies any shipped bar that is neither already in {@code scanDir} nor
-	 * listed as installed before.
+	 * recorded as installed there before.
 	 *
-	 * @param installedBefore names of bars installed on an earlier start; those
-	 *          are left alone however the user has since disposed of them
+	 * @param installedBefore paths of bar folders installed on an earlier start,
+	 *          as returned by {@link #recordKey(File)}; those are left alone
+	 *          however the user has since disposed of them
 	 * @return the bar folders written, empty when there was nothing to do
 	 */
 	public static List<File> installMissing(final File scanDir,
@@ -81,8 +82,9 @@ public final class BundledBars {
 		final List<File> written = new ArrayList<>();
 		try {
 			for (final String bar : bundledBarNames()) {
-				if (installedBefore != null && installedBefore.contains(bar)) continue;
 				final File target = new File(scanDir, bar);
+				if (installedBefore != null && installedBefore.contains(recordKey(
+					target))) continue;
 				if (target.exists()) continue;
 				if (copyBar(bar, target)) written.add(target);
 			}
@@ -96,6 +98,25 @@ public final class BundledBars {
 				": " + t.getMessage());
 		}
 		return written;
+	}
+
+	/**
+	 * How an installed bar is recorded: the full path of its folder, not its
+	 * name.
+	 * <p>
+	 * Preferences are stored per user, not per Fiji installation, so recording
+	 * bare names meant that installing a second Fiji on the same machine skipped
+	 * the example bars entirely — the record from the first one already claimed
+	 * they were done. Recording the path keeps each installation independent
+	 * while still letting a deleted bar stay deleted where it was deleted.
+	 */
+	public static String recordKey(final File barDir) {
+		try {
+			return barDir.getCanonicalPath();
+		}
+		catch (final IOException e) {
+			return barDir.getAbsolutePath();
+		}
 	}
 
 	/** Names of the bar folders shipped in the jar. */

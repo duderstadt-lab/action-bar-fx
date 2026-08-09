@@ -306,7 +306,7 @@ public class DefaultActionBarService extends AbstractService implements
 		if (written.isEmpty()) return;
 
 		for (final File bar : written)
-			installedBefore.add(bar.getName());
+			installedBefore.add(BundledBars.recordKey(bar));
 		prefService.put(ActionBarService.class, INSTALLED_BARS_KEY, String.join(
 			File.pathSeparator, installedBefore));
 	}
