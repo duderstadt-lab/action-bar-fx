@@ -25,20 +25,47 @@ colored by category with nothing to number. Both ship in
 
 ## Install
 
-Copy `target/action-bar-fx-*.jar` into `Fiji.app/jars/` and restart. Both
-example bars ship inside the jar and are written into `Fiji.app/ActionBar/` on
-first start, so they appear in the menu straight away — neither is opened until
-you ask for it. They need
-[Mars](https://duderstadt-lab.github.io/mars-docs/) installed for their command
-buttons.
+action-bar-fx is on the **Mars-Latest** update site, together with
+[Mars](https://duderstadt-lab.github.io/mars-docs/) itself. Update sites are how
+Fiji installs and then keeps plugins current: you tick one once, and everything
+on it arrives and stays up to date with every later **Help › Update…**.
+
+If you have never used the updater, in Fiji:
+
+1. **Help › Update…**. The ImageJ Updater opens and checks what has changed. On
+   a fresh Fiji it usually finds core updates first — let those install and
+   restart Fiji when it asks, then come back to step 1.
+2. In the updater window, click **Manage update sites** (bottom left).
+3. A list of sites appears. Find **Mars-Latest** and tick its checkbox. It is a
+   listed site, so there is no URL to type — but for reference it is
+   `https://sites.imagej.net/Mars-Latest/`, and it needs a Fiji on Java 21 or
+   newer.
+4. Click **Apply and Close**.
+5. Back in the updater, click **Apply changes**, and let the downloads finish.
+6. Restart Fiji.
+
+Both example bars now appear under **Plugins › Action Bar FX**, and the Mars
+commands they call are installed too. Neither bar opens until you ask for it.
+
+### Without the updater
+
+Copy `target/action-bar-fx-*.jar` into `Fiji.app/jars/` and restart. Two things
+have to travel with it, and are not part of Fiji:
+
+- `ikonli-materialdesign2-pack` — every icon comes from this pack. Without it
+  buttons draw without icons and the icon picker is empty.
+- `atlantafx-base` — the base theme for the bar windows.
+
+The example bars call Mars commands, so they need
+[Mars](https://duderstadt-lab.github.io/mars-docs/) as well.
+
+### Where the bars live
+
+Both examples ship inside the jar and are written into `Fiji.app/ActionBar/` on
+first start. Your own bars go in the same folder.
 
 Each is installed once per Fiji installation and then left alone: an edited bar
-is never overwritten, and a deleted one does not come back. Your own bars go in
-the same folder.
-
-Icons come from `ikonli-materialdesign2-pack`, which is a separate jar. Without
-it the buttons draw without icons and the icon picker is empty, so make sure it
-travels with `action-bar-fx` — an update site needs it uploaded too.
+is never overwritten, and a deleted one does not come back.
 
 Hyphens, case and the plural do not matter in the folder name — `ActionBar`,
 `action-bars` and `Action Bars` are all scanned — because getting it slightly
