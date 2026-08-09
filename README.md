@@ -6,7 +6,7 @@ Custom button palettes for Fiji. A bar is a column of colored buttons, each one
 launching an ImageJ command, a script, or an IJ1 macro — the tools of one
 workflow gathered in a single window instead of scattered across the menus.
 
-<img src="images/fret-power-tools.png" width="290" align="top"> <img src="images/mars-power-tools.png" width="308" align="top">
+<img src="images/fret-power-tools.png" height="470"> <img src="images/mars-power-tools.png" height="470">
 
 A replacement for the legacy ImageJ ActionBar plugin, built on JavaFX and
 AtlantaFX.
@@ -63,7 +63,7 @@ The theme is remembered between sessions and applies to every open bar. Because
 a button stores one base color and every state derives from it, the same bar
 reads correctly in both:
 
-<img src="images/mars-power-tools.png" width="290" align="top"> <img src="images/mars-power-tools-dark.png" width="290" align="top">
+<img src="images/mars-power-tools.png" height="430"> <img src="images/mars-power-tools-dark.png" height="430">
 
 ## Making a bar
 

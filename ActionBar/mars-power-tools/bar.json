@@ -161,7 +161,7 @@
     },
     {
       "type" : "button",
-      "label" : "Open N5 as ImagePlus (s3)",
+      "label" : "Open N5 as ImagePlus (S3)",
       "paletteIndex" : 5,
       "icon" : "mdi2c-cube-outline",
       "action" : {
