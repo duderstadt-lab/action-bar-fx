@@ -10,6 +10,17 @@
     -fx-text-fill: -button-fg;
 }
 
+/* The base theme is layered as an ordinary stylesheet rather than set as the
+   user agent one, so its .button:focused rule competes with ours instead of
+   sitting underneath it. Without this a focused button loses its color — white
+   text on a white background. Kept above :hover so hovering still wins. */
+.action-button:focused {
+    -fx-background-color: -button-accent;
+    -fx-border-color: -button-fg;
+    -fx-border-width: 2;
+    -fx-border-radius: 7;
+}
+
 .action-button:hover {
     -fx-background-color: derive(-button-accent, 12%);
 }

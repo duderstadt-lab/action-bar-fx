@@ -39,6 +39,7 @@ import org.scijava.prefs.PrefService;
 
 import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
+
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Parent;
@@ -70,6 +71,7 @@ public final class ThemeManager {
 
 	private static final Set<Scene> SCENES = Collections.newSetFromMap(
 		new WeakHashMap<>());
+
 
 	private static PrefService prefService;
 	private static Theme theme;
@@ -124,19 +126,35 @@ public final class ThemeManager {
 	 * before anyone switches theme.
 	 */
 	public static synchronized void applyStylesheets(final Parent parent) {
-		parent.getStylesheets().setAll(url(BASE_CSS), url(isDark() ? DARK_CSS
-			: LIGHT_CSS));
-
-		// A dialog has no scene until it is shown, so wait for one.
-		if (parent.getScene() != null) applyBaseTheme(parent.getScene());
-		else parent.sceneProperty().addListener((obs, old, scene) -> {
-			if (scene != null) applyBaseTheme(scene);
-		});
+		parent.getStylesheets().setAll(stylesheets());
 	}
 
 	private static void style(final Scene scene) {
-		applyBaseTheme(scene);
-		scene.getStylesheets().setAll(url(BASE_CSS), url(isDark() ? DARK_CSS
+		scene.getStylesheets().setAll(stylesheets());
+	}
+
+	/**
+	 * The stylesheets a bar window wears: the AtlantaFX base theme, then ours on
+	 * top of it.
+	 * <p>
+	 * AtlantaFX is layered as an ordinary stylesheet rather than set as the
+	 * scene's user agent stylesheet, and that detail matters. Setting it per
+	 * scene replaced Modena for the window but not for the menus, drop-downs and
+	 * tooltips opened from it — a popup is a window of its own, with a scene of
+	 * its own that a per-scene user agent stylesheet never reaches. Those popups
+	 * fell back to Modena while resolving against AtlantaFX, and every drop-down
+	 * filled the console with "Could not resolve '-fx-text-background-color'"
+	 * and "String cannot be cast to Color".
+	 * <p>
+	 * Layering instead leaves Modena as the user agent stylesheet everywhere, so
+	 * it stays self-consistent and popups are fine, while our windows still get
+	 * the AtlantaFX look. Setting it globally would fix the popups too, but that
+	 * is the thing that broke every other JavaFX plugin in Fiji.
+	 */
+	private static List<String> stylesheets() {
+		final String baseTheme = isDark() ? new PrimerDark()
+			.getUserAgentStylesheet() : new PrimerLight().getUserAgentStylesheet();
+		return Arrays.asList(baseTheme, url(BASE_CSS), url(isDark() ? DARK_CSS
 			: LIGHT_CSS));
 	}
 
@@ -154,34 +172,15 @@ public final class ThemeManager {
 	 */
 	private static void defend(final Scene scene) {
 		scene.getStylesheets().addListener((ListChangeListener<String>) change -> {
-			final List<String> wanted = Arrays.asList(url(BASE_CSS), url(isDark()
-				? DARK_CSS : LIGHT_CSS));
+			final List<String> wanted = stylesheets();
 			if (scene.getStylesheets().equals(wanted)) return;
 			// Re-entrant edits of an observable list under its own listener are
 			// not allowed, so restore on the next pulse.
 			Platform.runLater(() -> {
-				if (!scene.getStylesheets().equals(wanted)) {
-					applyBaseTheme(scene);
-					scene.getStylesheets().setAll(wanted);
-				}
+				if (!scene.getStylesheets().equals(wanted)) scene.getStylesheets()
+					.setAll(wanted);
 			});
 		});
-	}
-
-	/**
-	 * Puts the AtlantaFX base theme on one scene.
-	 * <p>
-	 * Deliberately {@code Scene.setUserAgentStylesheet} and never
-	 * {@code Application.setUserAgentStylesheet}: the latter is global to the
-	 * JVM, and a bar is a guest in a Fiji full of other people's JavaFX windows.
-	 * Setting it globally replaced Modena everywhere the moment a bar opened,
-	 * which broke every stylesheet written against Modena — mars-fx's among them,
-	 * with "Could not resolve '-fx-text-base-color'" and windows that changed
-	 * appearance. Per scene, ActionBarFX styles only its own windows.
-	 */
-	private static void applyBaseTheme(final Scene scene) {
-		scene.setUserAgentStylesheet(isDark() ? new PrimerDark()
-			.getUserAgentStylesheet() : new PrimerLight().getUserAgentStylesheet());
 	}
 
 	private static String url(final String resource) {
