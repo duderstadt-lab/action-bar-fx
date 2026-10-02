@@ -51,8 +51,10 @@
     -fx-scale-y: 1.02;
 }
 
+/* Dimmed while the command runs, but still legible: 0.55 on the dark theme
+   read as switched off rather than busy. */
 .action-button:disabled {
-    -fx-opacity: 0.55;
+    -fx-opacity: 0.72;
 }
 
 /* Buttons without a step still reserve this slot, so labels line up. */

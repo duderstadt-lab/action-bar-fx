@@ -85,6 +85,10 @@ public class ActionButton extends Button {
 		this.messages = messages;
 
 		getStyleClass().add("action-button");
+		// Clicked, never tabbed to. Leaving these traversable put a focus ring on
+		// the top button as soon as a bar opened, and moved it to the button below
+		// whichever one had just been pressed.
+		setFocusTraversable(false);
 		HoverEffect.install(this);
 
 		badge.getStyleClass().add("step-badge");

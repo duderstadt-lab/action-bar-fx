@@ -14,12 +14,10 @@
    user agent one, so its .button:focused rule competes with ours instead of
    sitting underneath it. Without this a focused button loses its color — white
    text on a white background. Kept above :hover so hovering still wins.
-   The ring is a background layer, not a border, so focus does not change the
-   button's size and shift everything below it. */
+   No ring is drawn: a bar is a palette of things to click, and a button that
+   looks selected merely because the window opened is a distraction. */
 .action-button:focused {
-    -fx-background-color: -button-fg, -button-accent;
-    -fx-background-insets: 0, 2;
-    -fx-background-radius: 7, 5;
+    -fx-background-color: -button-accent;
 }
 
 .action-button:hover {
