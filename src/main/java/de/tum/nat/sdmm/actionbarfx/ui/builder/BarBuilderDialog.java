@@ -173,7 +173,7 @@ public class BarBuilderDialog {
 	private Region buildCenter() {
 		itemList.setPrefWidth(240);
 		final Label empty = new Label("No rows yet.\nPress Button to add one.");
-		empty.getStyleClass().add("form-hint");
+		empty.getStyleClass().add("editor-placeholder");
 		empty.setWrapText(true);
 		itemList.setPlaceholder(empty);
 		itemList.getSelectionModel().selectedItemProperty().addListener((obs, old,

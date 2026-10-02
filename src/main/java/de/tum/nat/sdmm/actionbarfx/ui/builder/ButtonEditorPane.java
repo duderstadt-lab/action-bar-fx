@@ -126,7 +126,7 @@ public class ButtonEditorPane extends VBox {
 			actionEditors);
 		VBox.setVgrow(actionEditors, Priority.ALWAYS);
 
-		placeholder.getStyleClass().add("form-hint");
+		placeholder.getStyleClass().add("editor-placeholder");
 		placeholder.setWrapText(true);
 
 		getChildren().addAll(placeholder, content);

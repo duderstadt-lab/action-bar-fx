@@ -17,10 +17,9 @@
    user agent one, so its .button:focused rule competes with ours instead of
    sitting underneath it. Kept above :hover so hovering still wins. */
 .action-button:focused {
-    -fx-background-color: derive(-button-accent, -45%);
-    -fx-border-color: -button-fg;
-    -fx-border-width: 2;
-    -fx-border-radius: 7;
+    -fx-background-color: -button-fg, derive(-button-accent, -45%);
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 7, 5;
 }
 
 .action-button:hover {
@@ -32,9 +31,9 @@
 }
 
 .action-button.action-error {
-    -fx-border-color: #EF5350;
-    -fx-border-width: 2;
-    -fx-border-radius: 7;
+    -fx-background-color: #EF5350, derive(-button-accent, -45%);
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 7, 5;
 }
 
 .action-button .action-label,

@@ -72,7 +72,12 @@
     -fx-progress-color: -button-fg;
 }
 
-.bar-separator {
+/* Written as :horizontal to match the specificity of the base theme's own
+   .separator:horizontal, which sets 0.75em above and below. A plain
+   .bar-separator loses to it whatever the stylesheet order, and the gap between
+   groups grows by half a button. */
+.bar-separator,
+.bar-separator:horizontal {
     -fx-padding: 3 2 3 2;
 }
 
@@ -109,6 +114,14 @@
 .form-hint {
     -fx-opacity: 0.75;
     -fx-font-size: 11px;
+}
+
+/* The "nothing selected yet" messages. These are the only thing on screen when
+   they show, so they are read at normal size rather than set in the small,
+   faded type used for hints beside a field. */
+.editor-placeholder {
+    -fx-font-size: 13px;
+    -fx-opacity: 0.9;
 }
 
 /* Palette swatches in the button editor. */

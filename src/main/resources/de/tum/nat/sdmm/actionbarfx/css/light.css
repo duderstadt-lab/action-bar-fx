@@ -13,12 +13,13 @@
 /* The base theme is layered as an ordinary stylesheet rather than set as the
    user agent one, so its .button:focused rule competes with ours instead of
    sitting underneath it. Without this a focused button loses its color — white
-   text on a white background. Kept above :hover so hovering still wins. */
+   text on a white background. Kept above :hover so hovering still wins.
+   The ring is a background layer, not a border, so focus does not change the
+   button's size and shift everything below it. */
 .action-button:focused {
-    -fx-background-color: -button-accent;
-    -fx-border-color: -button-fg;
-    -fx-border-width: 2;
-    -fx-border-radius: 7;
+    -fx-background-color: -button-fg, -button-accent;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 7, 5;
 }
 
 .action-button:hover {
@@ -30,9 +31,9 @@
 }
 
 .action-button.action-error {
-    -fx-border-color: #C62828;
-    -fx-border-width: 2;
-    -fx-border-radius: 7;
+    -fx-background-color: #C62828, -button-accent;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 7, 5;
 }
 
 .action-button .action-label,

@@ -120,7 +120,7 @@ public class IconPickerPane extends VBox {
 				"action-bar-fx." : "No icons match.");
 		empty.setWrapText(true);
 		empty.setMaxWidth(320);
-		empty.getStyleClass().add("form-hint");
+		empty.getStyleClass().add("editor-placeholder");
 		grid.setPlaceholder(empty);
 
 		selectionLabel.getStyleClass().add("icon-selection");
